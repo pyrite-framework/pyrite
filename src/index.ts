@@ -1,6 +1,6 @@
 import { Pyrite } from "./pyrite";
-import { ChatComponent } from "./components/ChatComponent";
+import { Chat } from "./components/Chat";
 
 const pyrite = new Pyrite({
-	component: ChatComponent
+	component: Chat
 });

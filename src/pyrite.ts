@@ -6,11 +6,12 @@ export function Render(selector: string, attributes: object, ...children: Array<
 
 export function Template (template: Function): any {
 	return function (target: any, method: any, descriptor: any): any {
-		target.prototype.view = function() {
-			return template(this);
+		target.prototype.view = function(args: any) {
+			return template.call(this, args);
 		};
 	}
 }
+
 
 export class Pyrite {
 	constructor(private params: any) {
@@ -18,6 +19,6 @@ export class Pyrite {
 	}
 
 	render() {
-		m.mount(document.body, this.params.component);
+		setTimeout(() => m.mount(document.body, this.params.component));
 	}
 }
