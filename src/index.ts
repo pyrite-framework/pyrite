@@ -1,6 +1,2 @@
-import { Pyrite } from "./pyrite";
-import { Chat } from "./components/Chat";
-
-const pyrite = new Pyrite({
-	component: Chat
-});
+export { Pyrite, core } from "./pyrite";
+export { Component, Render, Inject } from "./decorators";

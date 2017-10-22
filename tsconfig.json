@@ -6,8 +6,18 @@
 		"strict": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
-		//"declaration": true,
+		"declaration": true,
 		"jsx": "react",
-		"jsxFactory": "Render"
-	}
+		"jsxFactory": "Render",
+		"outDir": "./lib",
+		"rootDir": "."
+	},
+	"include": [
+		"./src"
+	],
+	"exclude": [
+		"node_modules",
+		"lib",
+		"public"
+	]
 }

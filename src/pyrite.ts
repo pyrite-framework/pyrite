@@ -1,24 +1,31 @@
 import * as m from "mithril";
+import "./jsx";
 
-export function Render(selector: string, attributes: object, ...children: Array<any>): any{
-    return m(selector, attributes, children);
-}
+export const Injections: any = {}
 
-export function Template (template: Function): any {
-	return function (target: any, method: any, descriptor: any): any {
-		target.prototype.view = function(args: any) {
-			return template.call(this, args);
-		};
-	}
-}
-
+export const core = m;
 
 export class Pyrite {
 	constructor(private params: any) {
-		this.render();
+		if (params.inject) {
+			const names = Object.keys(params.inject);
+
+			const promises = names.map((name) => params.inject[name]);
+
+			Promise.all(promises)
+			.then((values: any) => {
+				values.forEach((value: any, index: number) => {
+					const name = names[index];
+					Injections[name] = value;
+				});
+
+				this.render();
+			});
+
+		} else this.render();
 	}
 
 	render() {
-		setTimeout(() => m.mount(document.body, this.params.component));
+		setTimeout(() => m.route(document.body, "/", this.params.routes));
 	}
 }
