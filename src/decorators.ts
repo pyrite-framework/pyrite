@@ -18,11 +18,23 @@ export function Component (template: Function): any {
 			}
 
 			const output = new target(this);
+
 			if(this.attrs) {
 				Object.keys(this.attrs).forEach((attr: string) => {
 					output[attr] = this.attrs[attr];
 				});
 			}
+
+			output.refs = {};
+
+			setTimeout(() => {
+				const elements = this.dom.querySelectorAll("[ref]");
+
+				elements.forEach((element: any) => {
+					const refName = element.getAttribute("ref");
+					output.refs[refName] = element;
+				});
+			});
 
 			return output;
 		}
