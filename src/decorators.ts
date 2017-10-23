@@ -18,7 +18,6 @@ export function Component (template: Function): any {
 			}
 
 			const output = new target(this);
-
 			const attrs = target.prototype.__attributes;
 			if (attrs) {
 				output[attrs] = {};
@@ -29,7 +28,6 @@ export function Component (template: Function): any {
 			}
 
 			const refs = target.prototype.__refs;
-
 			if (refs) {
 				output[refs] = {};
 
@@ -41,6 +39,11 @@ export function Component (template: Function): any {
 						output[refs][refName] = element;
 					});
 				});
+			}
+
+			const children = target.prototype.__children;
+			if (children) {
+				output[children] = this.children;
 			}
 
 			return output;
@@ -66,6 +69,10 @@ export function Inject (name: string): any {
 
 export function Refs(target: any, method: string, descriptor?: any): any {
 	target.__refs = method;
+}
+
+export function Children(target: any, method: string, descriptor?: any): any {
+	target.__children = method;
 }
 
 export function Attributes(target: any, method: string, descriptor?: any): any {
