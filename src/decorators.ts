@@ -17,34 +17,33 @@ export function Component (template: Function): any {
 				delete target.prototype.__inject;
 			}
 
+			const output = new target(this);
+
+			const attrs = target.prototype.__attributes;
+			if (attrs) {
+				output[attrs] = {};
+
+				Object.keys(this.attrs).forEach((attr: string) => {
+					output[attrs][attr] = this.attrs[attr];
+				});
+			}
+
 			const refs = target.prototype.__refs;
+
 			if (refs) {
-				target.prototype[refs] = {};
+				output[refs] = {};
 
 				setTimeout(() => {
 					const elements = this.dom.querySelectorAll("[ref]");
 
 					elements.forEach((element: any) => {
 						const refName = element.getAttribute("ref");
-						target.prototype[refs][refName] = element;
+						output[refs][refName] = element;
 					});
 				});
-
-				delete target.prototype.__refs;
 			}
 
-			const attrs = target.prototype.__attributes;
-			if (attrs) {
-				target.prototype[attrs] = {};
-
-				Object.keys(this.attrs).forEach((attr: string) => {
-					target.prototype[attrs][attr] = this.attrs[attr];
-				});
-
-				delete target.prototype.__attributes;
-			}
-
-			return new target(this);
+			return output;
 		}
 
 		target.prototype.view = function(args: any) {
@@ -65,11 +64,11 @@ export function Inject (name: string): any {
 	}
 }
 
-export function Refs (target: any, method: any, descriptor: any): any {
+export function Refs(target: any, method: string, descriptor?: any): any {
 	target.__refs = method;
 }
 
-export function Attributes (target: any, method: any, descriptor: any): any {
+export function Attributes(target: any, method: string, descriptor?: any): any {
 	target.__attributes = method;
 }
 
