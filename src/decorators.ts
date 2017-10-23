@@ -17,26 +17,34 @@ export function Component (template: Function): any {
 				delete target.prototype.__inject;
 			}
 
-			const output = new target(this);
+			const refs = target.prototype.__refs;
+			if (refs) {
+				target.prototype[refs] = {};
 
-			if(this.attrs) {
-				Object.keys(this.attrs).forEach((attr: string) => {
-					output[attr] = this.attrs[attr];
+				setTimeout(() => {
+					const elements = this.dom.querySelectorAll("[ref]");
+
+					elements.forEach((element: any) => {
+						const refName = element.getAttribute("ref");
+						target.prototype[refs][refName] = element;
+					});
 				});
+
+				delete target.prototype.__refs;
 			}
 
-			output.refs = {};
+			const attrs = target.prototype.__attributes;
+			if (attrs) {
+				target.prototype[attrs] = {};
 
-			setTimeout(() => {
-				const elements = this.dom.querySelectorAll("[ref]");
-
-				elements.forEach((element: any) => {
-					const refName = element.getAttribute("ref");
-					output.refs[refName] = element;
+				Object.keys(this.attrs).forEach((attr: string) => {
+					target.prototype[attrs][attr] = this.attrs[attr];
 				});
-			});
 
-			return output;
+				delete target.prototype.__attributes;
+			}
+
+			return new target(this);
 		}
 
 		target.prototype.view = function(args: any) {
@@ -55,6 +63,14 @@ export function Inject (name: string): any {
 			name, method
 		});
 	}
+}
+
+export function Refs (target: any, method: any, descriptor: any): any {
+	target.__refs = method;
+}
+
+export function Attributes (target: any, method: any, descriptor: any): any {
+	target.__attributes = method;
 }
 
 function getDescendantProp(obj: any, desc?: string): any {
