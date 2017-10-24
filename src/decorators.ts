@@ -38,11 +38,25 @@ export function Component (template: Function): any {
 			return output;
 		}
 
-		target.prototype.$onInit = target.prototype.oninit;
-		target.prototype.$onBeforeUpdate = target.prototype.onbeforeupdate;
-		target.prototype.$onUpdate = target.prototype.onupdate;
-		target.prototype.$onBeforeRemove = target.prototype.onbeforeremove;
-		target.prototype.$onRemove = target.prototype.onremove;
+		target.prototype.oninit = function(args:any) {
+			if (this.$onInit) this.$onInit(args);
+		}
+
+		target.prototype.onbeforeupdate = function(args:any) {
+			if (this.$onBeforeUpdate) this.$onBeforeUpdate(args);
+		}
+
+		target.prototype.onupdate = function(args:any) {
+			if (this.$onUpdate) this.$onUpdate(args);
+		}
+
+		target.prototype.onbeforeremove = function(args:any) {
+			if (this.$onBeforeRemove) this.$onBeforeRemove(args);
+		}
+
+		target.prototype.onremove = function(args:any) {
+			if (this.$onRemove) this.$onRemove(args);
+		}
 
 		target.prototype.oncreate = function(args: any) {
 			const refs = target.prototype.__refs;
