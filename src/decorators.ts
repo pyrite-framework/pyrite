@@ -31,13 +31,11 @@ export function Component (template: Function): any {
 			if (refs) {
 				output[refs] = {};
 
-				setTimeout(() => {
-					const elements = this.dom.querySelectorAll("[ref]");
-
-					elements.forEach((element: any) => {
-						const refName = element.getAttribute("ref");
-						output[refs][refName] = element;
-					});
+				this.children.forEach((children: any) => {
+					const ref = children.attrs.ref;
+					if (ref) return;
+					if (typeof children.tag === 'string') output[refs][ref] = children.dom;
+					else output[refs][ref] = children.state;
 				});
 			}
 
