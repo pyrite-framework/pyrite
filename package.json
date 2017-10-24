@@ -1,6 +1,6 @@
 {
   "name": "pyrite",
-  "version": "2.4.4",
+  "version": "2.5.0",
   "description": "Pyrite Components",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
@@ -20,11 +20,13 @@
   "homepage": "https://github.com/pyrite-framework/pyrite#readme",
   "dependencies": {
     "@types/mithril": "^1.1.10",
-    "mithril": "^1.1.5"
+    "mithril": "^1.1.5",
+    "mithril-nested-router": "0.0.5"
   },
   "devDependencies": {
-    "typescript": "^2.5.3",
+    "@types/node": "^8.0.46",
     "ts-loader": "^3.0.3",
+    "typescript": "^2.5.3",
     "webpack": "^3.3.0"
   }
 }
