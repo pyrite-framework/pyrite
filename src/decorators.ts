@@ -7,7 +7,7 @@ export function Render(selector: string, attributes: object, ...children: Array<
 
 export function Component (template: Function): any {
 	return function (target: any, method: any, descriptor: any): any {
-		function newTarget(this: any) {
+		function newTarget(this: any, args: any) {
 			const injects = target.prototype.__inject;
 			if (injects) {
 				injects.forEach((inject: any) => {
@@ -28,16 +28,7 @@ export function Component (template: Function): any {
 			}
 
 			const refs = target.prototype.__refs;
-			if (refs) {
-				output[refs] = {};
-
-				this.children.forEach((children: any) => {
-					const ref = children.attrs.ref;
-					if (ref) return;
-					if (typeof children.tag === 'string') output[refs][ref] = children.dom;
-					else output[refs][ref] = children.state;
-				});
-			}
+			if (refs) output[refs] = {};
 
 			const children = target.prototype.__children;
 			if (children) {
@@ -46,6 +37,22 @@ export function Component (template: Function): any {
 
 			return output;
 		}
+
+		target.prototype.$onInit = target.prototype.oninit;
+		target.prototype.$onBeforeUpdate = target.prototype.onbeforeupdate;
+		target.prototype.$onUpdate = target.prototype.onupdate;
+		target.prototype.$onBeforeRemove = target.prototype.onbeforeremove;
+		target.prototype.$onRemove = target.prototype.onremove;
+
+		target.prototype.oncreate = function(args: any) {
+			const refs = target.prototype.__refs;
+
+			if (refs && args.instance.children && args.instance.children.length) {
+				setRefs(this[refs], args.instance.children);
+			}
+
+			if (this.$onCreate) this.$onCreate(args);
+		};
 
 		target.prototype.view = function(args: any) {
 			return template.call(this, this, args);
@@ -85,4 +92,16 @@ function getDescendantProp(obj: any, desc?: string): any {
 	while (arr.length && (obj = obj[arr.shift() || '']));
 
 	return obj;
+}
+
+function setRefs(output: any, elements: any) {
+	elements.forEach((element: any) => {
+		const ref = element.attrs && element.attrs.ref;
+		if (ref) {
+			if (typeof element.tag === 'string') output[ref] = element.dom;
+			else output[ref] = element.state;
+		}
+
+		if (element.children && element.children.length) setRefs(output, element.children);
+	});
 }
