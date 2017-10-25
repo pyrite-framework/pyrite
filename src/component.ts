@@ -5,8 +5,8 @@ export class PyriteComponent {
 		elements.forEach((element: any) => {
 			const ref = element.attrs && element.attrs.ref;
 			if (ref) {
-				if (typeof element.tag === 'string') output[ref] = element.dom;
-				else output[ref] = element.state;
+				if (typeof element.tag === "function") return output[ref] = element.state;
+				else output[ref] = element.dom;
 			}
 
 			if (element.children && element.children.length) PyriteComponent.setRefs(output, element.children);
