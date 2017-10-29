@@ -28,7 +28,7 @@ export class Router {
 			const lastRoute = fooRoutes.pop();
 
 			routes[path] = {
-				view(args: any) {
+				render(args: any) {
 					Object.assign(RouteParams, args.attrs);
 
 					const render = fooRoutes.reduce((prev: any, next: any, i: any) => {

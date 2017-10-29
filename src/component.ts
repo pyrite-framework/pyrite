@@ -52,6 +52,8 @@ export class PyriteComponent {
 		};
 
 		target.prototype.view = function(args: any) {
+			if (target.prototype.__children) this[target.prototype.__children] = args.children;
+
 			return template.call(this, this, args);
 		};
 	}
@@ -79,7 +81,6 @@ export class PyriteComponent {
 			}
 
 			if (target.prototype.__refs) component[target.prototype.__refs] = {};
-			if (target.prototype.__children) component[target.prototype.__children] = this.children;
 			if (target.prototype.__routeParams) component[target.prototype.__routeParams] = RouteParams;
 
 			return component;
