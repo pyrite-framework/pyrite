@@ -1,8 +1,11 @@
 import { Injections } from "./pyrite";
+import { RouteParams } from "./router";
 
 export class PyriteComponent {
 	static setRefs(output: any, elements: any) {
 		elements.forEach((element: any) => {
+			if (element.tag === "#") return;
+
 			const ref = element.attrs && element.attrs.ref;
 
 			if (typeof element.tag === "function") {
@@ -76,8 +79,8 @@ export class PyriteComponent {
 			}
 
 			if (target.prototype.__refs) component[target.prototype.__refs] = {};
-
 			if (target.prototype.__children) component[target.prototype.__children] = this.children;
+			if (target.prototype.__routeParams) component[target.prototype.__routeParams] = RouteParams;
 
 			return component;
 		}

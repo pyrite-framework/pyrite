@@ -1,8 +1,6 @@
-import * as m from "mithril";
 import "./jsx"
-
-const Router = require("mithril-nested-router");
-const router = Router.create(m);
+import * as m from "mithril";
+import { Router } from "./router";
 
 export const Injections: any = {}
 
@@ -29,11 +27,10 @@ export class Pyrite {
 	}
 
 	render() {
-		const rootElement = this.params.rootElement || document.body;
-		const rootPath = this.params.rootPath || "/";
+		const router = new Router(this.params);
 
 		setTimeout(() => {
-			router.defineRoutes(rootElement, rootPath, this.params.routes);
+			router.run();
 		});
 	}
 }

@@ -1,6 +1,6 @@
 {
   "name": "pyrite",
-  "version": "2.5.2",
+  "version": "2.6.0",
   "description": "Pyrite Components",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/pyrite-framework/pyrite.git"
   },
-  "author": "",
+  "author": "Fabio Garcia",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/pyrite-framework/pyrite/issues"
@@ -20,8 +20,7 @@
   "homepage": "https://github.com/pyrite-framework/pyrite#readme",
   "dependencies": {
     "@types/mithril": "^1.1.10",
-    "mithril": "^1.1.5",
-    "mithril-nested-router": "0.0.5"
+    "mithril": "^1.1.5"
   },
   "devDependencies": {
     "@types/node": "^8.0.46",

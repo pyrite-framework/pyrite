@@ -32,3 +32,7 @@ export function Children(target: any, method: string, descriptor?: any): any {
 export function Attributes(target: any, method: string, descriptor?: any): any {
 	target.__attributes = method;
 }
+
+export function RouteParams(target: any, method: string, descriptor?: any): any {
+	target.__routeParams = method;
+}
