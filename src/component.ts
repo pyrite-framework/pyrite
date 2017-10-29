@@ -4,7 +4,7 @@ import { RouteParams } from "./router";
 export class PyriteComponent {
 	static setRefs(output: any, elements: any) {
 		elements.forEach((element: any) => {
-			if (element.tag === "#") return;
+			if (!element || element.tag === "#") return;
 
 			const ref = element.attrs && element.attrs.ref;
 
