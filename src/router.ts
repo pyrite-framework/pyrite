@@ -27,13 +27,14 @@ export class Router {
 			const fooRoutes = nextRoutes.slice();
 			const lastRoute = fooRoutes.pop();
 
-			const render = fooRoutes.reduce((prev: any, next: any, i: any) => {
-				return m(next.component, next.attrs, prev);
-			}, m(lastRoute.component, lastRoute.attrs));
-
 			routes[path] = {
 				view(args: any) {
 					Object.assign(RouteParams, args.attrs);
+
+					const render = fooRoutes.reduce((prev: any, next: any, i: any) => {
+						return m(next.component, next.attrs, prev);
+					}, m(lastRoute.component, lastRoute.attrs));
+
 					return render;
 				}
 			};
