@@ -10,7 +10,8 @@
 		"jsx": "react",
 		"jsxFactory": "Render",
 		"outDir": "./lib",
-		"rootDir": "."
+		"rootDir": ".",
+		"sourceMap": true
 	},
 	"include": [
 		"./src"
