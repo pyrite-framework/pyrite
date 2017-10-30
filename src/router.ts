@@ -11,7 +11,7 @@ export class Router {
 		this.rootElement = config.rootElement || document.body;
 		this.rootPath = config.rootPath || "/";
 
-		if (config.params.prefix) m.route.prefix(config.params.prefix);
+		if (config.prefix) m.route.prefix(config.prefix);
 
 		this.routes = this.buildRoutes(config.routes);
 	}
