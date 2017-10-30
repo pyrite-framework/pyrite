@@ -8,29 +8,32 @@ export const core = m;
 
 export class Pyrite {
 	constructor(private params: any) {
-		if (params.inject) {
-			const names = Object.keys(params.inject);
+		if (params.inject) this.inject();
+		else this.render();
+	}
 
-			const promises = names.map((name) => params.inject[name]);
+	private inject() {
+		const names = Object.keys(this.params.inject);
 
-			Promise.all(promises)
-			.then((values: any) => {
-				values.forEach((value: any, index: number) => {
+		const injections = names.map((name) => this.params.inject[name]);
+
+		let promises = Promise.resolve();
+
+		injections.forEach((inject, index) => {
+			promises = promises.then(() => {
+				return inject.then((value: any) => {
 					const name = names[index];
 					Injections[name] = value;
 				});
-
-				this.render();
 			});
+		});
 
-		} else this.render();
+		promises.then(() => this.render());
 	}
 
-	render() {
+	private render() {
 		const router = new Router(this.params);
 
-		setTimeout(() => {
-			router.run();
-		});
+		setTimeout(() => router.run());
 	}
 }

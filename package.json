@@ -1,6 +1,6 @@
 {
   "name": "pyrite",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "Pyrite Components",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
