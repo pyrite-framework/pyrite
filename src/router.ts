@@ -33,7 +33,7 @@ export class Router {
 				render(args: any) {
 					Object.assign(RouteParams, args.attrs);
 
-					const render = fooRoutes.reduce((prev: any, next: any, i: any) => {
+					const render = fooRoutes.reduce((prev: any, next: any) => {
 						return m(next.component, next.attrs, prev);
 					}, m(lastRoute.component, lastRoute.attrs));
 
