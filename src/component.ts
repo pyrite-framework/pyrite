@@ -44,7 +44,7 @@ export class PyriteComponent {
 		target.prototype.oncreate = function(args: any) {
 			const refs = target.prototype.__refs;
 
-			if (refs && args.instance.children && args.instance.children.length) {
+			if (refs && args.instance && args.instance.children && args.instance.children.length) {
 				PyriteComponent.setRefs(this[refs], args.instance.children);
 			}
 
