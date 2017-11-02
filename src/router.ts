@@ -35,12 +35,15 @@ export class Router {
 			const config = this.config;
 
 			routes[path] = {
-				onmatch(args: any, newPath: any) {
-					if (config.onRouteChange) config.onRouteChange(newPath, oldPath);
-
-					oldPath = newPath;
-                },
-				render(args: any) {
+				onbeforeupdate(newArgs: any, oldArgs: any) {
+					if (this.component.state.$onRouteUpdate) {
+						this.component.state.$onRouteUpdate(newArgs, oldArgs);
+					}
+				},
+				onupdate() {
+					if (config.onRouteChange) config.onRouteChange(m.route.get());
+				},
+				view(args: any) {
 					if (!Object.keys(args.attrs).length) {
 						Object.keys(RouteParams).forEach((attr) => {
 							delete RouteParams[attr];
@@ -52,6 +55,8 @@ export class Router {
 					const render = fooRoutes.reduce((prev: any, next: any) => {
 						return m(next.component, next.attrs, prev);
 					}, m(lastRoute.component, lastRoute.attrs));
+
+					this.component = render;
 
 					return render;
 				}

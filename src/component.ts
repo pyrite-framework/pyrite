@@ -25,8 +25,8 @@ export class PyriteComponent {
 			if (this.$onInit) this.$onInit(args);
 		}
 
-		target.prototype.onbeforeupdate = function(args:any) {
-			if (this.$onBeforeUpdate) this.$onBeforeUpdate(args);
+		target.prototype.onbeforeupdate = function(args:any, oldArgs: any) {
+			if (this.$onBeforeUpdate) this.$onBeforeUpdate(args, oldArgs);
 		}
 
 		target.prototype.onupdate = function(args:any) {
