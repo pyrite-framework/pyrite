@@ -32,35 +32,8 @@ export class Router {
 			const lastRoute = fooRoutes.pop();
 
 			let oldPath = this.rootPath;
-			const config = this.config;
 
-			routes[path] = {
-				onbeforeupdate(newArgs: any, oldArgs: any) {
-					if (this.component.state.$onRouteUpdate) {
-						this.component.state.$onRouteUpdate(newArgs, oldArgs);
-					}
-				},
-				onupdate() {
-					if (config.onRouteChange) config.onRouteChange(m.route.get());
-				},
-				view(args: any) {
-					if (!Object.keys(args.attrs).length) {
-						Object.keys(RouteParams).forEach((attr) => {
-							delete RouteParams[attr];
-						});
-                    } else {
-                    	Object.assign(RouteParams, args.attrs);
-                    }
-
-					const render = fooRoutes.reduce((prev: any, next: any) => {
-						return m(next.component, next.attrs, prev);
-					}, m(lastRoute.component, lastRoute.attrs));
-
-					this.component = render;
-
-					return render;
-				}
-			};
+			routes[path] = this.createRoute(fooRoutes, lastRoute, this.config);
 
 			if (route.routes) {
 				this.buildRoutes(route.routes, nextRoutes, routes);
@@ -68,6 +41,38 @@ export class Router {
 		});
 
 		return routes;
+	}
+
+	createRoute(fooRoutes: any, lastRoute: any, config: any) {
+		const route: any = {
+			onbeforeupdate(newArgs: any, oldArgs: any) {
+				if (this.component.state.$onRouteUpdate) {
+					this.component.state.$onRouteUpdate(newArgs, oldArgs);
+				}
+			},
+			onupdate() {
+				if (config.onRouteChange) config.onRouteChange(m.route.get());
+			},
+			view(args: any) {
+				if (!Object.keys(args.attrs).length) {
+					Object.keys(RouteParams).forEach((attr) => {
+						delete RouteParams[attr];
+					});
+	            } else {
+	            	Object.assign(RouteParams, args.attrs);
+	            }
+
+				const render = fooRoutes.reduce((prev: any, next: any) => {
+					return m(next.component, next.attrs, prev);
+				}, m(lastRoute.component, lastRoute.attrs));
+
+				this.component = render;
+
+				return render;
+			}
+		};
+
+		return route;
 	}
 
 	run() {
