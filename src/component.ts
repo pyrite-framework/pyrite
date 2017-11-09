@@ -87,12 +87,10 @@ export class PyriteComponent {
 		}
 	}
 
-	static getDescendantProp(obj: any, desc?: string): any {
-		if (!desc) return obj;
+	static getDescendantProp(obj: any, desc: string): any {
+		const arr: any = desc.split(".");
 
-		const arr = desc.split(".");
-
-		while (arr.length && (obj = obj[arr.shift() || ""]));
+		while (arr.length && (obj = obj[arr.shift()]));
 
 		return obj;
 	}
