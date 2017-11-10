@@ -1,4 +1,4 @@
-import "../config.ts";
+var cleanup = require('jsdom-global')()
 import * as m from "mithril";
 import * as sinon from "sinon";
 

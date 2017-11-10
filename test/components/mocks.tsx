@@ -1,5 +1,6 @@
 import { Render, Component, Attributes, Children, Refs, RouteParams, Inject } from "../../src";
 import { Injections } from "../../src/pyrite";
+import * as m from "mithril";
 
 Injections.example = {
 	get() {}
@@ -43,4 +44,16 @@ export class TestComponent {
 	constructor() {
 		this.loaded = true;
 	}
+}
+
+export function draw(Component: any) {
+	const component: any = (
+		<Component example="value">
+			<div>Children</div>
+		</Component>
+	);
+
+	m.render(document.body, component);
+
+	return component;
 }

@@ -26,8 +26,6 @@ export class Router {
 
 			path = path.split("//").join("/");
 
-			if (path[0] !== "/") path = "/" + path;
-
 			const fooRoutes = nextRoutes.slice();
 			const lastRoute = fooRoutes.pop();
 
@@ -44,32 +42,31 @@ export class Router {
 	}
 
 	createRoute(fooRoutes: any, lastRoute: any, config: any) {
+		let oldPath = this.rootPath;
+
 		const route: any = {
-			onbeforeupdate(newArgs: any, oldArgs: any) {
-				if (this.component.state.$onRouteUpdate) {
-					this.component.state.$onRouteUpdate(newArgs, oldArgs);
-				}
-			},
-			onupdate() {
-				if (config.onRouteChange) config.onRouteChange(m.route.get());
-			},
-			view(args: any) {
-				if (!Object.keys(args.attrs).length) {
-					Object.keys(RouteParams).forEach((attr) => {
-						delete RouteParams[attr];
-					});
-	            } else {
-	            	Object.assign(RouteParams, args.attrs);
-	            }
+			onmatch(args: any, newPath: any) {
+                if (config.onRouteChange){
+                    config.onRouteChange(newPath, oldPath);
+                }
+                oldPath = newPath;
+            },
 
-				const render = fooRoutes.reduce((prev: any, next: any) => {
-					return m(next.component, next.attrs, prev);
-				}, m(lastRoute.component, lastRoute.attrs));
+            render(args: any) {
+                if (!Object.keys(args.attrs).length) {
+                    Object.keys(RouteParams).forEach((attr: string) => {
+                        delete RouteParams[attr];
+                    });
+                } else {
+                    Object.assign(RouteParams, args.attrs);
+                }
 
-				this.component = render;
+                var render = fooRoutes.reduce((prev: any, next: any) => {
+                    return m(next.component, next.attrs, prev);
+                }, m(lastRoute.component, lastRoute.attrs));
 
-				return render;
-			}
+                return render;
+            }
 		};
 
 		return route;
