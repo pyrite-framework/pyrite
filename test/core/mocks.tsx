@@ -11,8 +11,9 @@ export class MainComponent {
 	@Inject("example") service: any;
 }
 
-export function loadPyrite(inject?: Boolean) {
+export function loadPyrite(inject?: Boolean, onRouteChange?: Function) {
 	const config: any = {
+		onRouteChange: onRouteChange,
 		routes: [{
 			path: "/",
 			component: MainComponent

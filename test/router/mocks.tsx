@@ -90,3 +90,11 @@ export function createRouter(options: any = {}) {
 		}]
 	});
 }
+
+export function createRouterForRouteChange(cb: Function) {
+	const options: any = {};
+
+	options.onRouteChange = cb;
+
+	return createRouter(options);
+}

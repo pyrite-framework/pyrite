@@ -1,4 +1,4 @@
-var cleanup = require('jsdom-global')()
+var jsdom = require('jsdom-global');
 import * as m from "mithril";
 import * as sinon from "sinon";
 
@@ -8,14 +8,18 @@ describe('Hooks', () => {
 	let component = m(TestHook as any);
 
 	before(function() {
-		m.render(document.body, component);
+		jsdom();
   	});
 
 	it('should call $onInit and then $onCreate', () => {
+		m.render(document.body, component);
+
 		sinon.assert.callOrder(component.state.$onInit, component.state.$onCreate);
 	});
 
 	it('should call $onBeforeUpdate and then $onUpdate', () => {
+		m.render(document.body, component);
+
 		component = m(TestHook as any);
 		m.render(document.body, component);
 

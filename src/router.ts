@@ -42,31 +42,39 @@ export class Router {
 	}
 
 	createRoute(fooRoutes: any, lastRoute: any, config: any) {
-		let oldPath = this.rootPath;
+		let newPath = this.rootPath;
+
+		lastRoute.attrs = lastRoute.attrs || {};
+
+		lastRoute.attrs.oncreate = () => {
+			if (config.onRouteChange) {
+				return new Promise((resolve) => {
+					const result = config.onRouteChange(newPath);
+					return resolve(result);
+				});
+			}
+		};
 
 		const route: any = {
-			onmatch(args: any, newPath: any) {
-                if (config.onRouteChange){
-                    config.onRouteChange(newPath, oldPath);
-                }
-                oldPath = newPath;
-            },
+			onmatch(args: any, path: any) {
+				newPath = path;
+			},
 
-            render(args: any) {
-                if (!Object.keys(args.attrs).length) {
-                    Object.keys(RouteParams).forEach((attr: string) => {
-                        delete RouteParams[attr];
-                    });
-                } else {
-                    Object.assign(RouteParams, args.attrs);
-                }
+			render(args: any) {
+				if (!Object.keys(args.attrs).length) {
+					Object.keys(RouteParams).forEach((attr: string) => {
+						delete RouteParams[attr];
+					});
+				} else {
+					Object.assign(RouteParams, args.attrs);
+				}
 
-                var render = fooRoutes.reduce((prev: any, next: any) => {
-                    return m(next.component, next.attrs, prev);
-                }, m(lastRoute.component, lastRoute.attrs));
+				var render = fooRoutes.reduce((prev: any, next: any) => {
+					return m(next.component, next.attrs, prev);
+				}, m(lastRoute.component, lastRoute.attrs));
 
-                return render;
-            }
+				return render;
+			}
 		};
 
 		return route;

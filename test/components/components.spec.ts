@@ -1,8 +1,7 @@
-var cleanup = require('jsdom-global')()
-import { expect, assert } from "chai";
+const cleanup = require('jsdom-global')()
+import { expect } from "chai";
 
 import { TestComponent, draw } from "./mocks";
-import { PyriteComponent } from "../../src/component";
 
 describe('Decorators', () => {
 	let component: any = draw(TestComponent);
