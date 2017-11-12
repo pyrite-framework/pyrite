@@ -53,13 +53,9 @@ export class Router {
 	}
 
 	addKeys(lastRoute: any, args: any) {
-		const params = lastRoute.path.split("/");
-
-		const validParams = params
-		.map((param: string) => param.includes(":") ? args[param.substring(1, param.length)] : "")
-		.join("/");
-
-		lastRoute.attrs.key = validParams;
+		if (Object.keys(args).length) {
+			lastRoute.attrs.key = Object.keys(args).map((key) => args[key]).join("/");
+		}
 	}
 
 	createRoute(fooRoutes: any, lastRoute: any, config: any) {
@@ -73,7 +69,12 @@ export class Router {
 
 		const route: any = {
 			onmatch: (args: any, newPath: any) => {
-				if (lastRoute.path.includes(":")) this.addKeys(lastRoute, args);
+				if (lastRoute.abstract) {
+					return m.route.set(newPath + lastRoute.default);
+				}
+
+				this.addKeys(lastRoute, args);
+
 				path.newPath = newPath;
 			},
 

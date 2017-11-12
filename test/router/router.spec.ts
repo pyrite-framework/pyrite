@@ -147,6 +147,18 @@ describe("Router", () => {
 		setTimeout(() => m.route.set("/child/another"), 10);
 	});
 
+	it("should call default route when is abstract", (done) => {
+		router = createRouterForRouteChange((to: any) => {
+			if (to === '/abstract/default'){
+				done();
+			}
+		});
+		
+		router.run();
+
+		m.route.set('/abstract');
+	});
+
 	it("should delete param routes", (done) => {
 		router = createRouterForRouteChange((to: any) => {
 			if (to === '/child'){

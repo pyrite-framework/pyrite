@@ -86,6 +86,15 @@ export function createRouter(options: any = {}) {
 			}, {
 				path: "/brother",
 				component: BrotherComponent
+			}, {
+				path: "/abstract",
+				component: ChildComponent,
+				abstract: true,
+				default: "/default",
+				routes: [{
+					path: "/default",
+					component: OtherChildComponent,
+				}]	
 			}]
 		}]
 	});
