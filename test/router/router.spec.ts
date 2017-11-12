@@ -117,6 +117,36 @@ describe("Router", () => {
 		m.route.set('/child/other');
 	});
 
+	it("should call $onInit of new children and call $onRemove of previous", (done) => {
+		let main: any;
+		let children: any;
+		let other: any;
+
+		router = createRouterForRouteChange((to: any) => {
+			if (to === '/child/other') {
+				main = (<any>document).body.vnodes[0];
+				children = main.children[0];
+				other = children.children[0];
+			} else if (to === '/child/another'){
+				main = (<any>document).body.vnodes[0];
+				children = main.children[0];
+				const another = children.children[0];
+
+				expect(RouteParams.id).to.equal('another');
+
+				sinon.assert.callOrder(another.state.$onInit, other.state.$onRemove);
+
+				done();
+			}
+		});
+
+		router.run();
+
+		m.route.set("/child/other");
+
+		setTimeout(() => m.route.set("/child/another"), 10);
+	});
+
 	it("should delete param routes", (done) => {
 		router = createRouterForRouteChange((to: any) => {
 			if (to === '/child'){

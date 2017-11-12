@@ -7,16 +7,29 @@ import { Pyrite, Inject, Component, Render } from "../../src";
 		</div>
 	);
 })
+export class MainComponentInject {
+	@Inject("example") service: any;
+}
+
+@Component(function(this: MainComponent) {
+	return (
+		<div>
+			<div>Main</div>
+		</div>
+	);
+})
 export class MainComponent {
 	@Inject("example") service: any;
 }
 
-export function loadPyrite(inject?: Boolean, onRouteChange?: Function) {
+export function loadPyrite(Component: any, inject?: Boolean, onRouteChange?: Function) {
 	const config: any = {
-		onRouteChange: onRouteChange,
 		routes: [{
 			path: "/",
-			component: MainComponent
+			component: Component,
+			attrs: {
+				oncreate: onRouteChange
+			}
 		}]
 	};
 

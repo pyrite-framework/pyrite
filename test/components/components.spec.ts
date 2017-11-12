@@ -1,7 +1,7 @@
 const cleanup = require('jsdom-global')()
 import { expect } from "chai";
 
-import { TestComponent, draw } from "./mocks";
+import { TestComponent, draw, ChildofChildComponent } from "./mocks";
 
 describe('Decorators', () => {
 	let component: any = draw(TestComponent);
@@ -11,7 +11,7 @@ describe('Decorators', () => {
 	});
 
 	it('should create a component correctly', () => {
-		expect(component.state.loaded).to.be.true;
+		expect((<any>document.body).vnodes[0].state.loaded).to.be.true;
 	});
 
 	it('should inject children correctly', () => {
@@ -38,5 +38,11 @@ describe('Decorators', () => {
 	it('should inject injections correctly', () => {
 		expect(component.state.service).to.not.be.undefined;
 		expect(component.state.serviceGet).to.not.be.undefined;
+	});
+
+	it('should delete a component correctly', () => {
+		component = draw(ChildofChildComponent);
+
+		expect((<any>document.body).vnodes[0].state.loaded).to.be.undefined;
 	});
 });

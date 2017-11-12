@@ -8,6 +8,8 @@
 
  export class Pyrite {
  	constructor(private params: any) {
+ 		Object.keys(Injections).forEach((key: string) => delete Injections[key]);
+
  		if (params.inject) this.inject();
  		else this.render();
  	}

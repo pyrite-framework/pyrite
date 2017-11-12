@@ -41,23 +41,40 @@ export class Router {
 		return routes;
 	}
 
-	createRoute(fooRoutes: any, lastRoute: any, config: any) {
-		let newPath = this.rootPath;
-
-		lastRoute.attrs = lastRoute.attrs || {};
-
+	addOnCreate(lastRoute: any, config: any, path: any) {
 		lastRoute.attrs.oncreate = () => {
 			if (config.onRouteChange) {
 				return new Promise((resolve) => {
-					const result = config.onRouteChange(newPath);
+					const result = config.onRouteChange(path.newPath);
 					return resolve(result);
 				});
 			}
 		};
+	}
+
+	addKeys(lastRoute: any, args: any) {
+		const params = lastRoute.path.split("/");
+
+		const validParams = params
+		.map((param: string) => param.includes(":") ? args[param.substring(1, param.length)] : "")
+		.join("/");
+
+		lastRoute.attrs.key = validParams;
+	}
+
+	createRoute(fooRoutes: any, lastRoute: any, config: any) {
+		let path = {
+			newPath: this.rootPath
+		};
+
+		lastRoute.attrs = lastRoute.attrs || {};
+
+		if (!lastRoute.attrs.oncreate) this.addOnCreate(lastRoute, config, path);
 
 		const route: any = {
-			onmatch(args: any, path: any) {
-				newPath = path;
+			onmatch: (args: any, newPath: any) => {
+				if (lastRoute.path.includes(":")) this.addKeys(lastRoute, args);
+				path.newPath = newPath;
 			},
 
 			render(args: any) {
