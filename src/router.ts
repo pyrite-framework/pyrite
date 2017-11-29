@@ -1,24 +1,7 @@
 import * as m from "mithril";
 
-export const RouteParams: any = {}
-
 export class Router {
-	routes: any;
-	rootElement: any;
-	rootPath: string;
-	config: any;
-
-	constructor(config: any) {
-		this.rootElement = config.rootElement || document.body;
-		this.rootPath = config.rootPath || "/";
-
-		if (config.prefix) m.route.prefix(config.prefix);
-
-		this.config = config;
-		this.routes = this.buildRoutes(config.routes);
-	}
-
-	buildRoutes(configRoutes: any, currentRoutes: Array<any> = [], routes: any = {}): any {
+	build(configRoutes: any, currentRoutes: Array<any> = [], routes: any = {}): any {
 		configRoutes.forEach((route: any) => {
 			const nextRoutes = currentRoutes.slice();
 			nextRoutes.unshift(route);
@@ -29,64 +12,35 @@ export class Router {
 			const fooRoutes = nextRoutes.slice();
 			const lastRoute = fooRoutes.pop();
 
-			let oldPath = this.rootPath;
-
-			routes[path] = this.createRoute(fooRoutes, lastRoute, this.config);
+			routes[path] = this.createRoute(fooRoutes, lastRoute);
 
 			if (route.routes) {
-				this.buildRoutes(route.routes, nextRoutes, routes);
+				this.build(route.routes, nextRoutes, routes);
 			}
 		});
 
 		return routes;
 	}
 
-	addOnCreate(lastRoute: any, config: any, path: any) {
-		lastRoute.attrs.oncreate = () => {
-			if (config.onRouteChange) {
-				return new Promise((resolve) => {
-					const result = config.onRouteChange(path.newPath);
-					return resolve(result);
-				});
-			}
-		};
-	}
+	private addKeys(lastRoute: any, args: any) {
+		lastRoute.attrs = lastRoute.attrs || {};
 
-	addKeys(lastRoute: any, args: any) {
 		if (Object.keys(args).length) {
 			lastRoute.attrs.key = Object.keys(args).map((key) => args[key]).join("/");
 		}
 	}
 
-	createRoute(fooRoutes: any, lastRoute: any, config: any) {
-		let path = {
-			newPath: this.rootPath
-		};
-
-		lastRoute.attrs = lastRoute.attrs || {};
-
-		if (!lastRoute.attrs.oncreate) this.addOnCreate(lastRoute, config, path);
-
+	private createRoute(fooRoutes: any, lastRoute: any) {
 		const route: any = {
 			onmatch: (args: any, newPath: any) => {
-				if (lastRoute.abstract) {
-					return m.route.set(newPath + lastRoute.default);
-				}
-
 				this.addKeys(lastRoute, args);
 
-				path.newPath = newPath;
+				if (lastRoute.abstract) {
+					m.route.set(newPath + lastRoute.default);
+				}
 			},
 
 			render(args: any) {
-				if (!Object.keys(args.attrs).length) {
-					Object.keys(RouteParams).forEach((attr: string) => {
-						delete RouteParams[attr];
-					});
-				} else {
-					Object.assign(RouteParams, args.attrs);
-				}
-
 				var render = fooRoutes.reduce((prev: any, next: any) => {
 					return m(next.component, next.attrs, prev);
 				}, m(lastRoute.component, lastRoute.attrs));
@@ -97,8 +51,6 @@ export class Router {
 
 		return route;
 	}
-
-	run() {
-		m.route(this.rootElement, this.rootPath, this.routes);
-	}
 }
+
+export const router = new Router();

@@ -1,217 +1,142 @@
+var jsdom = require("jsdom-global")();
+
 import { expect, assert } from "chai";
 import * as m from "mithril";
 import * as sinon from "sinon";
+import { router } from "../../src";
 
-import { RouteParams } from "../../src/router";
-import { createRouter, createRouterForRouteChange } from "./mocks";
-
-var jsdom = require('jsdom-global');
+import { 
+	routerConfig,
+	MainComponent,
+	ChildComponent,
+	OtherChildComponent,
+	BrotherComponent,
+	AbstractComponent,
+	DefaultComponent
+ } from "./mocks";
 
 describe("Router", () => {
-	let router: any;
+	let route: any;
 
 	beforeEach(() => {
-		jsdom();
+		MainComponent.prototype.$onCreate = () => {};
+		ChildComponent.prototype.$onCreate = () => {};
+		OtherChildComponent.prototype.$onCreate = () => {};
+		BrotherComponent.prototype.$onCreate = () => {};
+
+		m.render(document.body, m({ view: () => {} }));
+
+		route = router.build(routerConfig);
 	});
 
 	it("should render root route", (done) => {
-		router = createRouterForRouteChange((to: any) => {
+		MainComponent.prototype.$onCreate = () => {
 			const component = (<any>document).body.vnodes[0];
 
-			expect(component.state.name).to.equal("MainComponent");
+			expect(component.state).to.be.instanceOf(MainComponent);
 			sinon.assert.called(component.state.$onInit);
 
 			done();
-		});
+		};
 
-		router.run(); 
+		m.route(document.body, "/", route);
 	});
 
 	it("should load child route", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child'){
-				const main = (<any>document).body.vnodes[0];
-				const children = main.children[0];
-	
-				expect(children.state.name).to.equal("ChildComponent");
-				sinon.assert.called(children.state.$onInit);
-				
-				done();
-			}
-		});
+		ChildComponent.prototype.$onCreate = () => {
+			const main = (<any>document).body.vnodes[0];
+			const children = main.children[0];
 
-		router.run();
+			expect(main.state).to.be.instanceOf(MainComponent);
+			expect(children.state).to.be.instanceOf(ChildComponent);
+			
+			sinon.assert.callOrder(main.state.$onInit, children.state.$onInit);
+			
+			done();
+		};
 
-		m.route.set('/child');
+		m.route(document.body, "/", route);
+
+		m.route.set("/child");
 	});
 
 	it("should load sub child route", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child/other'){
-				const main = (<any>document).body.vnodes[0];
-				const children = main.children[0];
-				const other = children.children[0];
-				
-				sinon.assert.called(children.state.$onInit);
-				sinon.assert.called(other.state.$onInit);
-				
-				done();
-			}
-		});
+		OtherChildComponent.prototype.$onCreate = () => {
+			const main = (<any>document).body.vnodes[0];
+			const children = main.children[0];
+			const other = children.children[0];
+			
+			sinon.assert.called(children.state.$onInit);
+			sinon.assert.called(other.state.$onInit);
+			
+			done();
+		};
 
-		router.run();
+		m.route(document.body, "/", route);
 
-		m.route.set('/child/other');
+		m.route.set("/child/other");
 	});
 
 	it("should load brother and destroy other routes", (done) => {
-		let children: any;
-		let other: any;
-		let main: any;
+		let main: any, children: any, other: any;
 
-		router = createRouterForRouteChange((to: any) => {
-			if (to === "/child/other") {
-				main = (<any>document).body.vnodes[0];
-				children = main.children[0];
-				other = children.children[0];
-			} else if (to === '/brother'){
-				const brother = main.children[0];
+		OtherChildComponent.prototype.$onCreate = () => {
+			main = (<any>document).body.vnodes[0];
+			children = main.children[0];
+			other = children.children[0];
 
-				sinon.assert.called(other.state.$onRemove);
-				sinon.assert.called(children.state.$onRemove);
-				sinon.assert.called(brother.state.$onInit);
+			m.route.set("/brother")
+		};
 
-				done();
-			}
-		});
+		BrotherComponent.prototype.$onCreate = () => {			
+			const brother = main.children[0];
 
-		router.run();
+			sinon.assert.called(other.state.$onRemove);
+			sinon.assert.called(children.state.$onRemove);
+			sinon.assert.called(brother.state.$onInit);
 
-		m.route.set('/child/other');
-		setTimeout(() => m.route.set('/brother'), 10);
+			done();
+		};
+
+		m.route(document.body, "/", route);
+
+		m.route.set("/child/other");
 	});
 
-	it("should load param routes", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child/example'){
-				expect(RouteParams.id).to.equal('example');
-				done();
-			}
-		});
-
-		router.run();
-
-		m.route.set('/child/example');
-	});
-
-	it("should change param routes", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child/other'){
-				expect(RouteParams.id).to.equal('other');
-				done();
-			}
-		});
-
-		router.run();
-
-		m.route.set('/child/other');
-	});
 
 	it("should call $onInit of new children and call $onRemove of previous", (done) => {
-		let main: any;
-		let children: any;
-		let other: any;
-
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child/other') {
-				main = (<any>document).body.vnodes[0];
-				children = main.children[0];
-				other = children.children[0];
-			} else if (to === '/child/another'){
-				main = (<any>document).body.vnodes[0];
-				children = main.children[0];
+		let main: any, children: any, other: any;
+		
+		OtherChildComponent.prototype.$onCreate = function () {
+			if (this.props.key === "another") {
 				const another = children.children[0];
-
-				expect(RouteParams.id).to.equal('another');
 
 				sinon.assert.callOrder(another.state.$onInit, other.state.$onRemove);
 
-				done();
+				return done();
 			}
-		});
 
-		router.run();
+			main = (<any>document).body.vnodes[0];
+			children = main.children[0];
+			other = children.children[0];
+
+			m.route.set("/child/another");
+		};
+
+		m.route(document.body, "/", route);
 
 		m.route.set("/child/other");
-
-		setTimeout(() => m.route.set("/child/another"), 10);
 	});
 
 	it("should call default route when is abstract", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/abstract/default'){
-				done();
-			}
-		});
-		
-		router.run();
-
-		m.route.set('/abstract');
-	});
-
-	it("should delete param routes", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child'){
-				expect(RouteParams.id).to.be.undefined;
-				done();
-			}
-		});
-		router.run();
-
-		m.route.set('/child');
-	});
-
-	it("should set default path", () => {
-		router.rootPath = "/child";
-		router = createRouter();
-		router.run();
-
-		expect(m.route.get()).to.equal("/child");
-	});
-
-	it("should set default prefix", () => {
-		router = createRouter({
-			prefix: "#"
-		});
-
-		router.run();
-
-		expect(router.config.prefix).to.equal("#");
-	});
-
-	it("should set default HTML element", (done) => {
-		const element: any = document.createElement("div");
-
-		router = createRouterForRouteChange((to: any) => {
-			expect(element.vnodes[0].state).to.not.be.undefined;
+		DefaultComponent.prototype.$onCreate = () => {
+			expect(m.route.get()).to.be.equal('/abstract/default');
 			done();
-		});
-
-		router.rootElement = element;
-
-		router.run();
-	});
-
-	it("should call onRouteChange", (done) => {
-		router = createRouterForRouteChange((to: any) => {
-			if (to === '/child/example'){
-				done();
-			}
-		});
+		};
 		
-		router.run();
+		m.route(document.body, "/", route);
 
-		m.route.set('/child/example');
+		m.route.set("/abstract");
 	});
 
 });
