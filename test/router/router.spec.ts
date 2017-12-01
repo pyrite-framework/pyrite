@@ -1,4 +1,4 @@
-var jsdom = require("jsdom-global")();
+require("jsdom-global")();
 
 import { expect, assert } from "chai";
 import * as m from "mithril";
@@ -16,6 +16,7 @@ import {
  } from "./mocks";
 
 describe("Router", () => {
+
 	let route: any;
 
 	beforeEach(() => {

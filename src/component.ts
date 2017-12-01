@@ -1,3 +1,5 @@
+import { templateSimbol } from "./decorators";
+
 export abstract class Component<Attributes> {
 	props: Attributes;
 	children: Array<HTMLElement>;
@@ -12,7 +14,7 @@ export abstract class Component<Attributes> {
 	constructor(args: any) {
 		this.props = args.attrs;
 
-		const template: Function = Reflect.getMetadata("template", this);
+		const template: Function = Reflect.getMetadata(templateSimbol, this);
 
 		if (template) this.view = (args: any) => {
 			this.children = args.children;

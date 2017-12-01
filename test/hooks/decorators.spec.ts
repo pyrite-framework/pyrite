@@ -1,4 +1,4 @@
-var jsdom = require('jsdom-global')();
+require('jsdom-global')();
 
 import * as m from "mithril";
 import * as sinon from "sinon";
@@ -6,11 +6,12 @@ import * as sinon from "sinon";
 import { testHook, TestHook } from "./mocks";
 
 describe('Hooks', () => {
+
 	let component = testHook;
 
 	before(function() {
 		m.render(document.body, testHook);
-  	});
+	});
 
 	it('should call $onInit and then $onCreate', () => {
 		sinon.assert.callOrder(component.state.$onInit, component.state.$onCreate);
@@ -29,4 +30,5 @@ describe('Hooks', () => {
 
 		sinon.assert.callOrder(component.state.$onBeforeRemove, component.state.$onRemove);
 	});
+
 });

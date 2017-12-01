@@ -1,5 +1,6 @@
 import "./jsx";
 import "reflect-metadata";
+
 import * as m from "mithril";
 
 export { Template } from "./decorators";

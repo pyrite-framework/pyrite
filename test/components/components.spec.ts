@@ -1,4 +1,5 @@
-const cleanup = require('jsdom-global')();
+require('jsdom-global')();
+
 import { m } from "../../src";
 import { expect } from "chai";
 
@@ -6,7 +7,7 @@ import { testComponent, noTemplateComponent } from "./mocks";
 
 describe('Component', () => {
 
-	before(() => {		
+	before(() => {
 		m.render(document.body, testComponent);
 	});
 
