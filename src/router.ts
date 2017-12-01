@@ -1,104 +1,77 @@
 import * as m from "mithril";
+import { Component } from "./component";
 
-export const RouteParams: any = {}
+export interface Route {
+	path: string;
+	component: Component<any>;
+	abstract?: boolean;
+	default?: string;
+	routes?: Array<Route>;
+	attrs?: {[key: string]: any};
+}
+
+export interface RouteResolver {
+	onmatch(args: m.Vnode, newPath: m.Vnode): any;
+	render(args: any): any;
+}
+
+export type Routes = Array<Route>;
+
+export type RouteConfig = {[key: string]: RouteResolver};
 
 export class Router {
-	routes: any;
-	rootElement: any;
-	rootPath: string;
-	config: any;
-
-	constructor(config: any) {
-		this.rootElement = config.rootElement || document.body;
-		this.rootPath = config.rootPath || "/";
-
-		if (config.prefix) m.route.prefix(config.prefix);
-
-		this.config = config;
-		this.routes = this.buildRoutes(config.routes);
-	}
-
-	buildRoutes(configRoutes: any, currentRoutes: Array<any> = [], routes: any = {}): any {
-		configRoutes.forEach((route: any) => {
+	build(configRoutes: Routes, currentRoutes: Routes = [], routes: RouteConfig = {}): RouteConfig {
+		configRoutes.forEach((route: Route) => {
 			const nextRoutes = currentRoutes.slice();
-			nextRoutes.unshift(route);
-			let path = nextRoutes.reverse().map((element) => element.path).join("");
 
-			path = path.split("//").join("/");
+			nextRoutes.push(route);
 
-			const fooRoutes = nextRoutes.slice();
-			const lastRoute = fooRoutes.pop();
+			let allPaths = nextRoutes.map((element) => element.path);
+			const path = allPaths.join("").split("//").join("/");
 
-			let oldPath = this.rootPath;
+			routes[path] = this.createRoute(nextRoutes);
 
-			routes[path] = this.createRoute(fooRoutes, lastRoute, this.config);
-
-			if (route.routes) {
-				this.buildRoutes(route.routes, nextRoutes, routes);
-			}
+			if (route.routes) this.build(route.routes, nextRoutes, routes);
 		});
 
 		return routes;
 	}
 
-	addOnCreate(lastRoute: any, config: any, path: any) {
-		lastRoute.attrs.oncreate = () => {
-			if (config.onRouteChange) {
-				return new Promise((resolve) => {
-					const result = config.onRouteChange(path.newPath);
-					return resolve(result);
-				});
-			}
-		};
-	}
+	private addKeys(lastRoute: Route, args: {[key: string]: any}): void {
+		lastRoute.attrs = lastRoute.attrs || {};
 
-	addKeys(lastRoute: any, args: any) {
-		if (Object.keys(args).length) {
-			lastRoute.attrs.key = Object.keys(args).map((key) => args[key]).join("/");
+		const argsKeys = Object.keys(args);
+
+		if (argsKeys.length) {
+			lastRoute.attrs.key = argsKeys.map((key) => args[key]).join("/");
 		}
 	}
 
-	createRoute(fooRoutes: any, lastRoute: any, config: any) {
-		let path = {
-			newPath: this.rootPath
-		};
+	private createRoute(nextRoutes: Routes): RouteResolver {
+		const otherRoutes = nextRoutes.slice();
+		const lastRoute = otherRoutes.pop() as Route;
 
-		lastRoute.attrs = lastRoute.attrs || {};
-
-		if (!lastRoute.attrs.oncreate) this.addOnCreate(lastRoute, config, path);
-
-		const route: any = {
-			onmatch: (args: any, newPath: any) => {
-				if (lastRoute.abstract) {
-					return m.route.set(newPath + lastRoute.default);
-				}
-
-				this.addKeys(lastRoute, args);
-
-				path.newPath = newPath;
-			},
-
-			render(args: any) {
-				if (!Object.keys(args.attrs).length) {
-					Object.keys(RouteParams).forEach((attr: string) => {
-						delete RouteParams[attr];
-					});
-				} else {
-					Object.assign(RouteParams, args.attrs);
-				}
-
-				var render = fooRoutes.reduce((prev: any, next: any) => {
-					return m(next.component, next.attrs, prev);
-				}, m(lastRoute.component, lastRoute.attrs));
-
-				return render;
-			}
+		const route = {
+			onmatch: this.onmatch.bind(this, lastRoute),
+			render: this.render.bind(this, otherRoutes, lastRoute)
 		};
 
 		return route;
 	}
 
-	run() {
-		m.route(this.rootElement, this.rootPath, this.routes);
+	private onmatch(lastRoute: Route, args: m.Vnode, newPath: m.Vnode) {
+		this.addKeys(lastRoute, args);
+
+		if (lastRoute.abstract && lastRoute.default) {
+			m.route.set(newPath + lastRoute.default);
+		}
+	}
+
+	private render(otherRoutes: Routes, lastRoute: Route, args: m.Vnode) {
+		return otherRoutes.reduce((prev: m.Children, next: Route) => {
+			return m(next.component as m.Component, next.attrs as m.Attributes, prev);
+		}, m(lastRoute.component as m.Component, lastRoute.attrs as m.Attributes));
 	}
 }
+
+export const router = new Router();

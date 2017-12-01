@@ -1,6 +1,6 @@
 {
   "name": "pyrite",
-  "version": "2.8.0",
+  "version": "3.0.0",
   "description": "Pyrite Frontend",
   "main": "lib/src/index.js",
   "types": "lib/src/index.d.ts",
@@ -22,7 +22,9 @@
   "homepage": "https://github.com/pyrite-framework/pyrite#readme",
   "dependencies": {
     "@types/mithril": "^1.1.10",
-    "mithril": "^1.1.5"
+    "@types/reflect-metadata": "0.0.5",
+    "mithril": "^1.1.5",
+    "reflect-metadata": "^0.1.10"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",

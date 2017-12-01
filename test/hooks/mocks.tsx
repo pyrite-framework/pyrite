@@ -1,18 +1,17 @@
-import { Render, Component } from "../../src";
+import { m, Component, Template } from "../../src";
 import * as sinon from "sinon";
 
-@Component(() => {})
-export class TestHook {
-	$onInit: sinon.SinonSpy;
-	$onCreate: sinon.SinonSpy;
-	$onBeforeUpdate: sinon.SinonSpy;
-	$onUpdate: sinon.SinonSpy;
-	$onBeforeRemove: sinon.SinonSpy;
-	$onRemove: sinon.SinonSpy;
-
+@Template(function(this: TestHook) {
+	return (
+		<div>{this.text}</div>
+	);
+})
+export class TestHook extends Component<any> {
 	text: string;
+	
+	constructor(args: any) {
+		super(args);
 
-	constructor() {
 		this.$onInit = sinon.spy();
 		this.$onCreate = sinon.spy();
 		this.$onBeforeUpdate = sinon.spy();
@@ -21,3 +20,8 @@ export class TestHook {
 		this.$onRemove = sinon.spy();
 	}
 }
+
+
+export const testHook: any = (
+	<TestHook></TestHook>
+);

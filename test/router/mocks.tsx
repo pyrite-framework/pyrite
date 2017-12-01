@@ -1,109 +1,49 @@
-import { Component, Children, Render } from "../../src";
-import { Router, RouteParams } from "../../src/router";
+import { Component, Template, m } from "../../src";
 
 import * as sinon from "sinon";
 
-
-@Component(function(this: MainComponent) {
+@Template(function(this: TestComponent) {
 	return (
-		<div>
-			<div>Main</div>
-			<div>{this.children}</div>
-		</div>
+		<div>{this.children}</div>
 	);
 })
-export class MainComponent {
-	@Children children: any;
+export class TestComponent extends Component<any> {
+	constructor(args: m.Vnode) {
+		super(args);
 
-	name = "MainComponent";
-
-	$onInit = sinon.spy();
-	$onRemove = sinon.spy();
+		this.$onInit = sinon.spy();
+		this.$onRemove = sinon.spy();
+	}
 }
 
-@Component(function(this: ChildComponent) {
-	return (
-		<div>
-			<div>Child</div>
-			<div>{this.children}</div>
-		</div>
-	);
-})
-export class ChildComponent {
-	@Children children: any;	
-	
-	name = "ChildComponent";
+export class MainComponent extends TestComponent {}
+export class ChildComponent extends TestComponent {}
+export class OtherChildComponent extends TestComponent {}
+export class BrotherComponent extends TestComponent {}
+export class AbstractComponent extends TestComponent {}
+export class DefaultComponent extends TestComponent {}
 
-	$onInit = sinon.spy();
-	$onRemove = sinon.spy();
-}
-
-@Component(function(this: OtherChildComponent) {
-	return (
-		<div>
-			<div>Other</div>
-		</div>
-	);
-})
-export class OtherChildComponent {
-	name = "OtherChildComponent";
-
-	$onInit = sinon.spy();
-	$onRemove = sinon.spy();
-}
-
-@Component(function(this: BrotherComponent) {
-	return (
-		<div>
-			<div>Brother</div>
-			<div>{this.children}</div>
-		</div>
-	);
-})
-export class BrotherComponent {
-	@Children children: any;	
-	
-	name = "BrotherComponent";
-
-	$onInit = sinon.spy();
-	$onRemove = sinon.spy();
-}
-
-export function createRouter(options: any = {}) {
-	return new Router({
-		prefix: options.prefix,
-		onRouteChange: options.onRouteChange,
+export const routerConfig = [{
+	path: "/",
+	component: MainComponent,
+	routes: [{
+		path: "/child",
+		component: ChildComponent,
 		routes: [{
-			path: "/",
-			component: MainComponent,
-			routes: [{
-				path: "/child",
-				component: ChildComponent,
-				routes: [{
-					path: "/:id",
-					component: OtherChildComponent
-				}]
-			}, {
-				path: "/brother",
-				component: BrotherComponent
-			}, {
-				path: "/abstract",
-				component: ChildComponent,
-				abstract: true,
-				default: "/default",
-				routes: [{
-					path: "/default",
-					component: OtherChildComponent,
-				}]	
-			}]
+			path: "/:id",
+			component: OtherChildComponent
 		}]
-	});
-}
-
-export function createRouterForRouteChange(cb: Function) {
-	const options: any = {};
-
-	options.onRouteChange = cb;
-
-	return createRouter(options);
-}
+	}, {
+		path: "/brother",
+		component: BrotherComponent
+	}, {
+		path: "/abstract",
+		component: AbstractComponent,
+		abstract: true,
+		default: "/default",
+		routes: [{
+			path: "/default",
+			component: DefaultComponent
+		}]	
+	}]
+}];

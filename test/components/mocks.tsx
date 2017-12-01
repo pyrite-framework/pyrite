@@ -1,59 +1,33 @@
-import { Render, Component, Attributes, Children, Refs, RouteParams, Inject } from "../../src";
-import { Injections } from "../../src/pyrite";
-import * as m from "mithril";
+import { m, Template, Component } from "../../src";
 
-Injections.example = {
-	get() {}
-};
-
-@Component(function(this: ChildofChildComponent) {
-	return (<div>ChildofChild</div>);
-})
-export class ChildofChildComponent {}
-
-@Component(function(this: ChildComponent) {
-	return (<div>Child</div>);
-})
-export class ChildComponent {
-	loaded = true;
+interface TestComponentAttributes {
+	example: string;
 }
 
-@Component(function(this: TestComponent) {
+@Template(function(this: TestComponent) {
 	return (
 		<div>
-			TextNode
-			<div ref="example">Example</div>
-			<ChildComponent ref="component">
-				<ChildofChildComponent ref="subcomponent"></ChildofChildComponent>
-			</ChildComponent>
-			<ChildComponent></ChildComponent>
-			<div>{this.children}</div>
+			<p>{this.props.example}</p>
+			<span>{this.children}</span>
 		</div>
 	);
 })
-export class TestComponent {
-	@Children children: any;
-	@Attributes attrs: any;
-	@Refs refs: any;
-	@RouteParams params: any;
-	@Inject('example') service: any;
-	@Inject('example.get') serviceGet: any;
-
+class TestComponent extends Component<TestComponentAttributes> {
 	loaded: Boolean;
 
-	constructor() {
+	$onCreate() {
 		this.loaded = true;
 	}
 }
 
-export function draw(Component: any) {
-	const component: any = (
-		<Component example="value">
-			<div>Children</div>
-		</Component>
-	);
+class NoTemplateComponent extends Component<any> {}
 
-	m.render(document.body, component);
+export const testComponent: any = (
+	<TestComponent example="value">
+		<p>Children</p>
+	</TestComponent>
+);
 
-	return component;
-}
+export const noTemplateComponent: any = (
+	<NoTemplateComponent></NoTemplateComponent>
+);

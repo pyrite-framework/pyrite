@@ -7,7 +7,7 @@
 		"experimentalDecorators": true,
 		"declaration": true,
 		"jsx": "react",
-		"jsxFactory": "Render",
+		"jsxFactory": "m",
 		"outDir": "./lib",
 		"rootDir": ".",
 		"sourceMap": true
