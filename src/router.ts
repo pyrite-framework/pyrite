@@ -1,55 +1,76 @@
 import * as m from "mithril";
+import { Component } from "./component";
+
+export interface Route {
+	path: string;
+	component: Component<any>;
+	abstract?: boolean;
+	default?: string;
+	routes?: Array<Route>;
+	attrs?: {[key: string]: any};
+}
+
+export interface RouteResolver {
+	onmatch(args: m.Vnode, newPath: m.Vnode): any;
+	render(args: any): any;
+}
+
+export type Routes = Array<Route>;
+
+export type RouteConfig = {[key: string]: RouteResolver};
 
 export class Router {
-	build(configRoutes: any, currentRoutes: Array<any> = [], routes: any = {}): any {
-		configRoutes.forEach((route: any) => {
+	build(configRoutes: Routes, currentRoutes: Routes = [], routes: RouteConfig = {}): RouteConfig {
+		configRoutes.forEach((route: Route) => {
 			const nextRoutes = currentRoutes.slice();
-			nextRoutes.unshift(route);
-			let path = nextRoutes.reverse().map((element) => element.path).join("");
 
-			path = path.split("//").join("/");
+			nextRoutes.push(route);
 
-			const fooRoutes = nextRoutes.slice();
-			const lastRoute = fooRoutes.pop();
+			let allPaths = nextRoutes.map((element) => element.path);
+			const path = allPaths.join("").split("//").join("/");
 
-			routes[path] = this.createRoute(fooRoutes, lastRoute);
+			routes[path] = this.createRoute(nextRoutes);
 
-			if (route.routes) {
-				this.build(route.routes, nextRoutes, routes);
-			}
+			if (route.routes) this.build(route.routes, nextRoutes, routes);
 		});
 
 		return routes;
 	}
 
-	private addKeys(lastRoute: any, args: any) {
+	private addKeys(lastRoute: Route, args: {[key: string]: any}): void {
 		lastRoute.attrs = lastRoute.attrs || {};
 
-		if (Object.keys(args).length) {
-			lastRoute.attrs.key = Object.keys(args).map((key) => args[key]).join("/");
+		const argsKeys = Object.keys(args);
+
+		if (argsKeys.length) {
+			lastRoute.attrs.key = argsKeys.map((key) => args[key]).join("/");
 		}
 	}
 
-	private createRoute(fooRoutes: any, lastRoute: any) {
-		const route: any = {
-			onmatch: (args: any, newPath: any) => {
-				this.addKeys(lastRoute, args);
+	private createRoute(nextRoutes: Routes): RouteResolver {
+		const otherRoutes = nextRoutes.slice();
+		const lastRoute = otherRoutes.pop() as Route;
 
-				if (lastRoute.abstract) {
-					m.route.set(newPath + lastRoute.default);
-				}
-			},
-
-			render(args: any) {
-				var render = fooRoutes.reduce((prev: any, next: any) => {
-					return m(next.component, next.attrs, prev);
-				}, m(lastRoute.component, lastRoute.attrs));
-
-				return render;
-			}
+		const route = {
+			onmatch: this.onmatch.bind(this, lastRoute),
+			render: this.render.bind(this, otherRoutes, lastRoute)
 		};
 
 		return route;
+	}
+
+	private onmatch(lastRoute: Route, args: m.Vnode, newPath: m.Vnode) {
+		this.addKeys(lastRoute, args);
+
+		if (lastRoute.abstract && lastRoute.default) {
+			m.route.set(newPath + lastRoute.default);
+		}
+	}
+
+	private render(otherRoutes: Routes, lastRoute: Route, args: m.Vnode) {
+		return otherRoutes.reduce((prev: m.Children, next: Route) => {
+			return m(next.component as m.Component, next.attrs as m.Attributes, prev);
+		}, m(lastRoute.component as m.Component, lastRoute.attrs as m.Attributes));
 	}
 }
 

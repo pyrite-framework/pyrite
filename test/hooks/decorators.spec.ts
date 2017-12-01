@@ -9,7 +9,7 @@ describe('Hooks', () => {
 
 	let component = testHook;
 
-	before(function() {
+	before(() => {
 		m.render(document.body, testHook);
 	});
 

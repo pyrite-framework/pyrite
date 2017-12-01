@@ -15,7 +15,7 @@ interface TestComponentAttributes {
 class TestComponent extends Component<TestComponentAttributes> {
 	loaded: Boolean;
 
-	$onCreate(args: any) {
+	$onCreate() {
 		this.loaded = true;
 	}
 }

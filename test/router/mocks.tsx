@@ -2,13 +2,13 @@ import { Component, Template, m } from "../../src";
 
 import * as sinon from "sinon";
 
-@Template(function(this: TestComponent, args: any) {
+@Template(function(this: TestComponent) {
 	return (
-		<div>{args.children}</div>
+		<div>{this.children}</div>
 	);
 })
 export class TestComponent extends Component<any> {
-	constructor(args: any) {
+	constructor(args: m.Vnode) {
 		super(args);
 
 		this.$onInit = sinon.spy();

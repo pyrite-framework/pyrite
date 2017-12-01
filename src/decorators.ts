@@ -1,7 +1,10 @@
-export const templateSimbol = Symbol("template");
+import "./jsx";
+import * as m from "mithril";
 
-export function Template (template: Function): any {
-	return function (target: any, method: any, descriptor: any): any {
-		Reflect.defineMetadata(templateSimbol, template, target.prototype);
+export const templateSymbol = Symbol("template");
+
+export function Template (template: (vNode?: m.Vnode) => m.Children | JSX.Element | null | void): Function {
+	return function (target: Function): void {
+		Reflect.defineMetadata(templateSymbol, template, target.prototype);
 	}
 }

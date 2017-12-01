@@ -1,51 +1,54 @@
-import { templateSimbol } from "./decorators";
+import * as m from "mithril";
+import { templateSymbol } from "./decorators";
+
+export type Children = m.Children | JSX.Element | null | void;
 
 export abstract class Component<Attributes> {
 	props: Attributes;
-	children: Array<HTMLElement>;
+	children: m.Children;
 
-	$onInit(args?: any): any {}
-	$onCreate(args?: any): any {}
-	$onBeforeUpdate(args?: any, oldArgs?: any): any {}
-	$onUpdate(args?: any): any {}
-	$onBeforeRemove(args?: any): any {}
-	$onRemove(args?: any): any {}
+	$onInit(vNode?: m.Vnode): any {}
+	$onCreate(vNode?: m.Vnode): any {}
+	$onBeforeUpdate(vNode?: m.Vnode, oldvNode?: m.Vnode): any {}
+	$onUpdate(vNode?: m.Vnode): any {}
+	$onBeforeRemove(vNode?: m.Vnode): any {}
+	$onRemove(vNode?: m.Vnode): any {}
 
-	constructor(args: any) {
-		this.props = args.attrs;
+	constructor(vNode: m.Vnode) {
+		this.props = vNode.attrs as Attributes;
 
-		const template: Function = Reflect.getMetadata(templateSimbol, this);
+		const template: (vNode: m.Vnode) => Children = Reflect.getMetadata(templateSymbol, this);
 
-		if (template) this.view = (args: any) => {
-			this.children = args.children;
+		if (template) this.view = (vNode: m.Vnode): Children => {
+			this.children = vNode.children ;
 
-			return template.call(this, args);
+			return template.call(this, vNode);
 		};
 	}
 
-	oninit(args: any) {
-		return this.$onInit(args);
+	oninit(vNode: m.Vnode): any {
+		return this.$onInit(vNode);
 	}
 
-	oncreate(args: any) {
-		return this.$onCreate(args);
+	oncreate(vNode: m.Vnode): any {
+		return this.$onCreate(vNode);
 	}
 
-	onbeforeupdate(args:any, oldArgs: any) {
-		return this.$onBeforeUpdate(args, oldArgs);
+	onbeforeupdate(vNode:m.Vnode, oldvNode: m.Vnode): any {
+		return this.$onBeforeUpdate(vNode, oldvNode);
 	}
 
-	onupdate(args: any) {
-		return this.$onUpdate(args);
+	onupdate(vNode: m.Vnode): any {
+		return this.$onUpdate(vNode);
 	}
 
-	onbeforeremove(args: any) {
-		return this.$onBeforeRemove(args);
+	onbeforeremove(vNode: m.Vnode): any {
+		return this.$onBeforeRemove(vNode);
 	}
 
-	onremove(args: any) {
-		return this.$onRemove(args);
+	onremove(vNode: m.Vnode): any {
+		return this.$onRemove(vNode);
 	}
 
-	view(args: any) {}
+	view(vNode: m.Vnode): Children {}
 }

@@ -27,7 +27,7 @@ describe("Router", () => {
 
 		m.render(document.body, m({ view: () => {} }));
 
-		route = router.build(routerConfig);
+		route = router.build(routerConfig as any);
 	});
 
 	it("should render root route", (done) => {
