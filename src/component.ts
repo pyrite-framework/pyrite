@@ -4,7 +4,7 @@ import { templateSymbol } from "./decorators";
 export type Children = m.Children | JSX.Element | null | void;
 
 export abstract class Component<Attributes> {
-	props: Attributes;
+	props: Attributes & { ref?: (component: Component<Attributes>) => void };
 	children: m.Children;
 
 	$onInit(vNode?: m.Vnode): any {}
@@ -20,10 +20,12 @@ export abstract class Component<Attributes> {
 		const template: (vNode: m.Vnode) => Children = Reflect.getMetadata(templateSymbol, this);
 
 		if (template) this.view = (vNode: m.Vnode): Children => {
-			this.children = vNode.children ;
+			this.children = vNode.children;
 
 			return template.call(this, vNode);
 		};
+
+		if (this.props.ref) this.props.ref(this);
 	}
 
 	oninit(vNode: m.Vnode): any {

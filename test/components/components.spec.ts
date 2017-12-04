@@ -3,7 +3,7 @@ require('jsdom-global')();
 import { m } from "../../src";
 import { expect } from "chai";
 
-import { testComponent, noTemplateComponent } from "./mocks";
+import { testComponent, noTemplateComponent, NoTemplateComponent } from "./mocks";
 
 describe('Component', () => {
 
@@ -23,6 +23,11 @@ describe('Component', () => {
 	it('should inject children correctly', () => {
 		expect(testComponent.state.children).to.not.be.undefined;
 		expect(testComponent.state.children[0]).to.deep.include({ text: "Children" });
+	});
+
+	it('should inject components ref correctly', () => {
+		expect(testComponent.state.childComponent).to.be.instanceOf(NoTemplateComponent);
+		expect(testComponent.state.childComponent.props.example).to.equal("othervalue");
 	});
 
 	it('should have template', () => {

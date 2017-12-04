@@ -9,18 +9,20 @@ interface TestComponentAttributes {
 		<div>
 			<p>{this.props.example}</p>
 			<span>{this.children}</span>
+			<NoTemplateComponent bnbn={"hola"} ref={(component: NoTemplateComponent) => this.childComponent = component} example="othervalue"></NoTemplateComponent>
 		</div>
 	);
 })
 class TestComponent extends Component<TestComponentAttributes> {
 	loaded: Boolean;
+	childComponent: NoTemplateComponent;
 
 	$onCreate() {
 		this.loaded = true;
 	}
 }
 
-class NoTemplateComponent extends Component<any> {}
+export class NoTemplateComponent extends Component<any> {}
 
 export const testComponent: any = (
 	<TestComponent example="value">
