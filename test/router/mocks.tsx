@@ -1,4 +1,4 @@
-import { Component, Template, m } from "../../src";
+import { RouteComponent, Template, m } from "../../src";
 
 import * as sinon from "sinon";
 
@@ -7,12 +7,12 @@ import * as sinon from "sinon";
 		<div>{this.children}</div>
 	);
 })
-export class TestComponent extends Component<any> {
+export class TestComponent extends RouteComponent<any> {
 	constructor(args: m.Vnode) {
 		super(args);
 
-		this.$onInit = sinon.spy();
-		this.$onRemove = sinon.spy();
+		this.$onInitRoute = sinon.spy();
+		this.$onRemoveRoute = sinon.spy();
 	}
 }
 

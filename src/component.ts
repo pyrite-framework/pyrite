@@ -3,8 +3,13 @@ import { templateSymbol } from "./decorators";
 
 export type Children = m.Children | JSX.Element | null | void;
 
+export interface DefaultAttributes<Attributes> {
+	ref?: (component: Component<Attributes>) => void;
+	key?: string | number;
+}
+
 export abstract class Component<Attributes> {
-	props: Attributes & { ref?: (component: Component<Attributes>) => void };
+	props: Attributes & DefaultAttributes<Attributes>;
 	children: m.Children;
 
 	$onInit(vNode?: m.Vnode): any {}

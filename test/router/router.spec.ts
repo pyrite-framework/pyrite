@@ -20,10 +20,10 @@ describe("Router", () => {
 	let route: any;
 
 	beforeEach(() => {
-		MainComponent.prototype.$onCreate = () => {};
-		ChildComponent.prototype.$onCreate = () => {};
-		OtherChildComponent.prototype.$onCreate = () => {};
-		BrotherComponent.prototype.$onCreate = () => {};
+		MainComponent.prototype.$onCreateRoute = () => {};
+		ChildComponent.prototype.$onCreateRoute = () => {};
+		OtherChildComponent.prototype.$onCreateRoute = () => {};
+		BrotherComponent.prototype.$onCreateRoute = () => {};
 
 		m.render(document.body, m({ view: () => {} }));
 
@@ -31,11 +31,11 @@ describe("Router", () => {
 	});
 
 	it("should render root route", (done) => {
-		MainComponent.prototype.$onCreate = () => {
+		MainComponent.prototype.$onCreateRoute = () => {
 			const component = (<any>document).body.vnodes[0];
 
 			expect(component.state).to.be.instanceOf(MainComponent);
-			sinon.assert.called(component.state.$onInit);
+			sinon.assert.called(component.state.$onInitRoute);
 
 			done();
 		};
@@ -44,14 +44,14 @@ describe("Router", () => {
 	});
 
 	it("should load child route", (done) => {
-		ChildComponent.prototype.$onCreate = () => {
+		ChildComponent.prototype.$onCreateRoute = () => {
 			const main = (<any>document).body.vnodes[0];
 			const children = main.children[0];
 
 			expect(main.state).to.be.instanceOf(MainComponent);
 			expect(children.state).to.be.instanceOf(ChildComponent);
 			
-			sinon.assert.callOrder(main.state.$onInit, children.state.$onInit);
+			sinon.assert.callOrder(main.state.$onInitRoute, children.state.$onInitRoute);
 			
 			done();
 		};
@@ -62,13 +62,13 @@ describe("Router", () => {
 	});
 
 	it("should load sub child route", (done) => {
-		OtherChildComponent.prototype.$onCreate = () => {
+		OtherChildComponent.prototype.$onCreateRoute = () => {
 			const main = (<any>document).body.vnodes[0];
 			const children = main.children[0];
 			const other = children.children[0];
 			
-			sinon.assert.called(children.state.$onInit);
-			sinon.assert.called(other.state.$onInit);
+			sinon.assert.called(children.state.$onInitRoute);
+			sinon.assert.called(other.state.$onInitRoute);
 			
 			done();
 		};
@@ -81,7 +81,7 @@ describe("Router", () => {
 	it("should load brother and destroy other routes", (done) => {
 		let main: any, children: any, other: any;
 
-		OtherChildComponent.prototype.$onCreate = () => {
+		OtherChildComponent.prototype.$onCreateRoute = () => {
 			main = (<any>document).body.vnodes[0];
 			children = main.children[0];
 			other = children.children[0];
@@ -89,12 +89,12 @@ describe("Router", () => {
 			m.route.set("/brother")
 		};
 
-		BrotherComponent.prototype.$onCreate = () => {			
+		BrotherComponent.prototype.$onCreateRoute = () => {			
 			const brother = main.children[0];
 
-			sinon.assert.called(other.state.$onRemove);
-			sinon.assert.called(children.state.$onRemove);
-			sinon.assert.called(brother.state.$onInit);
+			sinon.assert.called(other.state.$onRemoveRoute);
+			sinon.assert.called(children.state.$onRemoveRoute);
+			sinon.assert.called(brother.state.$onInitRoute);
 
 			done();
 		};
@@ -105,14 +105,14 @@ describe("Router", () => {
 	});
 
 
-	it("should call $onInit of new children and call $onRemove of previous", (done) => {
+	it("should call $onInitRoute of new children and call $onRemoveRoute of previous", (done) => {
 		let main: any, children: any, other: any;
 		
-		OtherChildComponent.prototype.$onCreate = function () {
+		OtherChildComponent.prototype.$onCreateRoute = function () {
 			if (this.props.key === "another") {
 				const another = children.children[0];
 
-				sinon.assert.callOrder(another.state.$onInit, other.state.$onRemove);
+				sinon.assert.callOrder(another.state.$onInitRoute, other.state.$onRemoveRoute);
 
 				return done();
 			}
@@ -130,7 +130,7 @@ describe("Router", () => {
 	});
 
 	it("should call default route when is abstract", (done) => {
-		DefaultComponent.prototype.$onCreate = () => {
+		DefaultComponent.prototype.$onCreateRoute = () => {
 			expect(m.route.get()).to.be.equal('/abstract/default');
 			done();
 		};
