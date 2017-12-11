@@ -1,9 +1,9 @@
 import * as m from "mithril";
-import { RouteComponent } from "./route";
+import { Component } from "./component";
 
 export interface Route {
 	path: string;
-	component: RouteComponent<any> | typeof RouteComponent;
+	component: Component<any> | typeof Component;
 	abstract?: boolean;
 	default?: string;
 	routes?: Array<Route>;
@@ -31,6 +31,8 @@ export class Router {
 	}
 
 	private addKeys(lastRoute: Route, args: {[key: string]: any}): void {
+		lastRoute.props = lastRoute.props || {};
+
 		const argsKeys = Object.keys(args);
 
 		if (lastRoute.props && argsKeys.length) {
@@ -42,8 +44,6 @@ export class Router {
 		const otherRoutes = nextRoutes.slice();
 		const lastRoute = otherRoutes.pop() as Route;
 
-		this.setHooks(lastRoute);
-
 		const route = {
 			onmatch: this.onmatch.bind(this, lastRoute),
 			render: this.render.bind(this, otherRoutes, lastRoute)
@@ -52,46 +52,22 @@ export class Router {
 		return route;
 	}
 
-	private setHooks(route: Route) {
-		route.props = route.props || {};
-
-		route.props.oninit = function (this: RouteComponent<any>, args: m.Vnode) {
-			return this.$onInitRoute(args);
-		};
-
-		route.props.oncreate = function (this: RouteComponent<any>, args: m.Vnode) {
-			return this.$onCreateRoute(args);
-		};
-
-		route.props.onbeforeupdate = function (this: RouteComponent<any>, args: m.Vnode, oldArgs: m.Vnode) {
-			return this.$onBeforeUpdateRoute(args, oldArgs);
-		};
-
-		route.props.onupdate = function (this: RouteComponent<any>, args: m.Vnode) {
-			return this.$onUpdateRoute(args);
-		};
-
-		route.props.onbeforeremove = function (this: RouteComponent<any>, args: m.Vnode) {
-			return this.$onBeforeRemoveRoute(args);
-		};
-
-		route.props.onremove = function (this: RouteComponent<any>, args: m.Vnode) {
-			return this.$onRemoveRoute(args);
-		};
-	}
-
 	private onmatch(lastRoute: Route, args: m.Vnode, newPath: string) {
 		this.addKeys(lastRoute, args);
 
 		if (lastRoute.abstract && lastRoute.default) {
 			m.route.set(newPath + lastRoute.default);
 		}
+
+		return lastRoute.component;
 	}
 
 	private render(otherRoutes: Routes, lastRoute: Route, args: m.Vnode) {
-		return otherRoutes.reduce((prev: m.Children, next: Route) => {
-			return m(next.component as m.Component, next.props as m.Attributes, prev);
-		}, m(lastRoute.component as m.Component, lastRoute.props as m.Attributes));
+		const render = otherRoutes.reduce((prev: m.Children, next: Route) => {
+			return m(next.component as any, next.props as m.Attributes, prev);
+		}, m(lastRoute.component as any, lastRoute.props as m.Attributes));
+
+		return render;
 	}
 }
 

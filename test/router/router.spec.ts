@@ -12,7 +12,8 @@ import {
 	OtherChildComponent,
 	BrotherComponent,
 	AbstractComponent,
-	DefaultComponent
+	DefaultComponent,
+	DisabledComponent
  } from "./mocks";
 
 describe("Router", () => {
@@ -20,10 +21,10 @@ describe("Router", () => {
 	let route: any;
 
 	beforeEach(() => {
-		MainComponent.prototype.$onCreateRoute = () => {};
-		ChildComponent.prototype.$onCreateRoute = () => {};
-		OtherChildComponent.prototype.$onCreateRoute = () => {};
-		BrotherComponent.prototype.$onCreateRoute = () => {};
+		MainComponent.prototype.$onCreate = () => {};
+		ChildComponent.prototype.$onCreate = () => {};
+		OtherChildComponent.prototype.$onCreate = () => {};
+		BrotherComponent.prototype.$onCreate = () => {};
 
 		m.render(document.body, m({ view: () => {} }));
 
@@ -31,11 +32,11 @@ describe("Router", () => {
 	});
 
 	it("should render root route", (done) => {
-		MainComponent.prototype.$onCreateRoute = () => {
+		MainComponent.prototype.$onCreate = () => {
 			const component = (<any>document).body.vnodes[0];
 
 			expect(component.state).to.be.instanceOf(MainComponent);
-			sinon.assert.called(component.state.$onInitRoute);
+			sinon.assert.called(component.state.$onInit);
 
 			done();
 		};
@@ -44,14 +45,14 @@ describe("Router", () => {
 	});
 
 	it("should load child route", (done) => {
-		ChildComponent.prototype.$onCreateRoute = () => {
+		ChildComponent.prototype.$onCreate = () => {
 			const main = (<any>document).body.vnodes[0];
 			const children = main.children[0];
 
 			expect(main.state).to.be.instanceOf(MainComponent);
 			expect(children.state).to.be.instanceOf(ChildComponent);
 			
-			sinon.assert.callOrder(main.state.$onInitRoute, children.state.$onInitRoute);
+			sinon.assert.callOrder(main.state.$onInit, children.state.$onInit);
 			
 			done();
 		};
@@ -62,13 +63,13 @@ describe("Router", () => {
 	});
 
 	it("should load sub child route", (done) => {
-		OtherChildComponent.prototype.$onCreateRoute = () => {
+		OtherChildComponent.prototype.$onCreate = () => {
 			const main = (<any>document).body.vnodes[0];
 			const children = main.children[0];
 			const other = children.children[0];
 			
-			sinon.assert.called(children.state.$onInitRoute);
-			sinon.assert.called(other.state.$onInitRoute);
+			sinon.assert.called(children.state.$onInit);
+			sinon.assert.called(other.state.$onInit);
 			
 			done();
 		};
@@ -81,7 +82,7 @@ describe("Router", () => {
 	it("should load brother and destroy other routes", (done) => {
 		let main: any, children: any, other: any;
 
-		OtherChildComponent.prototype.$onCreateRoute = () => {
+		OtherChildComponent.prototype.$onCreate = () => {
 			main = (<any>document).body.vnodes[0];
 			children = main.children[0];
 			other = children.children[0];
@@ -89,12 +90,12 @@ describe("Router", () => {
 			m.route.set("/brother")
 		};
 
-		BrotherComponent.prototype.$onCreateRoute = () => {			
+		BrotherComponent.prototype.$onCreate = () => {			
 			const brother = main.children[0];
 
-			sinon.assert.called(other.state.$onRemoveRoute);
-			sinon.assert.called(children.state.$onRemoveRoute);
-			sinon.assert.called(brother.state.$onInitRoute);
+			sinon.assert.called(other.state.$onRemove);
+			sinon.assert.called(children.state.$onRemove);
+			sinon.assert.called(brother.state.$onInit);
 
 			done();
 		};
@@ -105,14 +106,14 @@ describe("Router", () => {
 	});
 
 
-	it("should call $onInitRoute of new children and call $onRemoveRoute of previous", (done) => {
+	it("should call $onInit of new children and call $onRemove of previous", (done) => {
 		let main: any, children: any, other: any;
 		
-		OtherChildComponent.prototype.$onCreateRoute = function () {
+		OtherChildComponent.prototype.$onCreate = function () {
 			if (this.props.key === "another") {
 				const another = children.children[0];
 
-				sinon.assert.callOrder(another.state.$onInitRoute, other.state.$onRemoveRoute);
+				sinon.assert.callOrder(another.state.$onInit, other.state.$onRemove);
 
 				return done();
 			}
@@ -130,7 +131,7 @@ describe("Router", () => {
 	});
 
 	it("should call default route when is abstract", (done) => {
-		DefaultComponent.prototype.$onCreateRoute = () => {
+		DefaultComponent.prototype.$onCreate = () => {
 			expect(m.route.get()).to.be.equal('/abstract/default');
 			done();
 		};
@@ -138,6 +139,22 @@ describe("Router", () => {
 		m.route(document.body, "/", route);
 
 		m.route.set("/abstract");
+	});
+
+	it("should draw anything when preventDraw is true", (done) => {
+		DisabledComponent.prototype.$onInit = function () {
+			this.preventDraw = true;
+		};
+
+		DisabledComponent.prototype.$onCreate = function (args: any) {
+			expect(args.dom).to.be.undefined;
+
+			done();
+		};
+		
+		m.route(document.body, "/", route);
+
+		m.route.set("/disabled");
 	});
 
 });

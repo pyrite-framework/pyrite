@@ -11,6 +11,7 @@ export interface DefaultAttributes<Attributes> {
 export abstract class Component<Attributes> {
 	props: Attributes & DefaultAttributes<Attributes>;
 	children: m.Children;
+	preventDraw?: boolean;
 
 	$onInit(vNode?: m.Vnode): any {}
 	$onCreate(vNode?: m.Vnode): any {}
@@ -27,35 +28,37 @@ export abstract class Component<Attributes> {
 		if (template) this.view = (vNode: m.Vnode): Children => {
 			this.children = vNode.children;
 
+			if (this.preventDraw) return null;
+
 			return template.call(this, vNode);
 		};
 
 		if (this.props.ref) this.props.ref(this);
 	}
 
-	oninit(vNode: m.Vnode): any {
+	private oninit(vNode: m.Vnode): any {
 		return this.$onInit(vNode);
 	}
 
-	oncreate(vNode: m.Vnode): any {
+	private oncreate(vNode: m.Vnode): any {
 		return this.$onCreate(vNode);
 	}
 
-	onbeforeupdate(vNode:m.Vnode, oldvNode: m.Vnode): any {
+	private onbeforeupdate(vNode:m.Vnode, oldvNode: m.Vnode): any {
 		return this.$onBeforeUpdate(vNode, oldvNode);
 	}
 
-	onupdate(vNode: m.Vnode): any {
+	private onupdate(vNode: m.Vnode): any {
 		return this.$onUpdate(vNode);
 	}
 
-	onbeforeremove(vNode: m.Vnode): any {
+	private onbeforeremove(vNode: m.Vnode): any {
 		return this.$onBeforeRemove(vNode);
 	}
 
-	onremove(vNode: m.Vnode): any {
+	private onremove(vNode: m.Vnode): any {
 		return this.$onRemove(vNode);
 	}
 
-	view(vNode: m.Vnode): Children {}
+	private view(vNode: m.Vnode): Children {}
 }

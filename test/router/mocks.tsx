@@ -1,4 +1,4 @@
-import { RouteComponent, Template, m } from "../../src";
+import { Component, Template, m } from "../../src";
 
 import * as sinon from "sinon";
 
@@ -7,14 +7,21 @@ import * as sinon from "sinon";
 		<div>{this.children}</div>
 	);
 })
-export class TestComponent extends RouteComponent<any> {
+export class TestComponent extends Component<any> {
 	constructor(args: m.Vnode) {
 		super(args);
 
-		this.$onInitRoute = sinon.spy();
-		this.$onRemoveRoute = sinon.spy();
+		this.$onInit = sinon.spy();
+		this.$onRemove = sinon.spy();
 	}
 }
+
+@Template(function(this: DisabledComponent) {
+	return (
+		<div>This should not be shown</div>
+	);
+})
+export class DisabledComponent extends Component<any> {}
 
 export class MainComponent extends TestComponent {}
 export class ChildComponent extends TestComponent {}
@@ -36,6 +43,9 @@ export const routerConfig = [{
 	}, {
 		path: "/brother",
 		component: BrotherComponent
+	},{
+		path: "/disabled",
+		component: DisabledComponent
 	}, {
 		path: "/abstract",
 		component: AbstractComponent,
