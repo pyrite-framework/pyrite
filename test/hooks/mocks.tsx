@@ -1,4 +1,4 @@
-import { m, Component, Template } from "../../src";
+import { Component, Template, m } from "../../src";
 import * as sinon from "sinon";
 
 @Template(function(this: TestHook) {

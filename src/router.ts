@@ -7,7 +7,7 @@ export interface Route {
 	abstract?: boolean;
 	default?: string;
 	routes?: Array<Route>;
-	props?: {[key: string]: any};
+	props?: m.Attributes & {[key: string]: any};
 }
 
 export type Routes = Array<Route>;

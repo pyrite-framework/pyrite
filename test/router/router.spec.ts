@@ -141,6 +141,22 @@ describe("Router", () => {
 		m.route.set("/abstract");
 	});
 
+	it("should draw everything when preventDraw is false", (done) => {
+		DisabledComponent.prototype.$onInit = function () {
+			this.preventDraw = false;
+		};
+
+		DisabledComponent.prototype.$onCreate = function (args: any) {
+			expect(args.dom).to.not.be.undefined;
+
+			done();
+		};
+		
+		m.route(document.body, "/", route);
+
+		m.route.set("/disabled");
+	});
+
 	it("should draw anything when preventDraw is true", (done) => {
 		DisabledComponent.prototype.$onInit = function () {
 			this.preventDraw = true;

@@ -28,7 +28,10 @@ export abstract class Component<Attributes> {
 		if (template) this.view = (vNode: m.Vnode): Children => {
 			this.children = vNode.children;
 
-			if (this.preventDraw) return null;
+			if (this.preventDraw) {
+				this.preventDraw = false;
+				return null;
+			}
 
 			return template.call(this, vNode);
 		};
@@ -60,5 +63,7 @@ export abstract class Component<Attributes> {
 		return this.$onRemove(vNode);
 	}
 
-	private view(vNode: m.Vnode): Children {}
+	private view(vNode: m.Vnode): Children {
+		return null;
+	}
 }
