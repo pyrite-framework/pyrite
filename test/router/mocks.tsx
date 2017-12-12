@@ -8,7 +8,7 @@ import * as sinon from "sinon";
 	);
 })
 export class TestComponent extends Component<any> {
-	constructor(args: m.Vnode) {
+	constructor(args: m.Vnode<any, any>) {
 		super(args);
 
 		this.$onInit = sinon.spy();

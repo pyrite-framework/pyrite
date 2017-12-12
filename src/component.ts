@@ -13,19 +13,19 @@ export abstract class Component<Attributes> {
 	children: m.Children;
 	preventDraw?: boolean;
 
-	$onInit(vNode?: m.Vnode): any {}
-	$onCreate(vNode?: m.Vnode): any {}
-	$onBeforeUpdate(vNode?: m.Vnode, oldvNode?: m.Vnode): any {}
-	$onUpdate(vNode?: m.Vnode): any {}
-	$onBeforeRemove(vNode?: m.Vnode): any {}
-	$onRemove(vNode?: m.Vnode): any {}
+	$onInit(vNode?: m.Vnode<Attributes, any>): any {}
+	$onCreate(vNode?: m.Vnode<Attributes, any>): any {}
+	$onBeforeUpdate(vNode?: m.Vnode<Attributes, any>, oldvNode?: m.Vnode<Attributes, any>): any {}
+	$onUpdate(vNode?: m.Vnode<Attributes, any>): any {}
+	$onBeforeRemove(vNode?: m.Vnode<Attributes, any>): any {}
+	$onRemove(vNode?: m.Vnode<Attributes, any>): any {}
 
-	constructor(vNode: m.Vnode) {
+	constructor(vNode: m.Vnode<Attributes, any>) {
 		this.props = vNode.attrs as Attributes;
 
-		const template: (vNode: m.Vnode) => Children = Reflect.getMetadata(templateSymbol, this);
+		const template: (vNode: m.Vnode<Attributes, any>) => Children = Reflect.getMetadata(templateSymbol, this);
 
-		if (template) this.view = (vNode: m.Vnode): Children => {
+		if (template) this.view = (vNode: m.Vnode<Attributes, any>): Children => {
 			this.children = vNode.children;
 
 			if (this.preventDraw) {
@@ -39,31 +39,31 @@ export abstract class Component<Attributes> {
 		if (this.props.ref) this.props.ref(this);
 	}
 
-	private oninit(vNode: m.Vnode): any {
+	private oninit(vNode: m.Vnode<Attributes, any>): any {
 		return this.$onInit(vNode);
 	}
 
-	private oncreate(vNode: m.Vnode): any {
+	private oncreate(vNode: m.Vnode<Attributes, any>): any {
 		return this.$onCreate(vNode);
 	}
 
-	private onbeforeupdate(vNode:m.Vnode, oldvNode: m.Vnode): any {
+	private onbeforeupdate(vNode:m.Vnode<Attributes, any>, oldvNode: m.Vnode<Attributes, any>): any {
 		return this.$onBeforeUpdate(vNode, oldvNode);
 	}
 
-	private onupdate(vNode: m.Vnode): any {
+	private onupdate(vNode: m.Vnode<Attributes, any>): any {
 		return this.$onUpdate(vNode);
 	}
 
-	private onbeforeremove(vNode: m.Vnode): any {
+	private onbeforeremove(vNode: m.Vnode<Attributes, any>): any {
 		return this.$onBeforeRemove(vNode);
 	}
 
-	private onremove(vNode: m.Vnode): any {
+	private onremove(vNode: m.Vnode<Attributes, any>): any {
 		return this.$onRemove(vNode);
 	}
 
-	private view(vNode: m.Vnode): Children {
+	private view(vNode: m.Vnode<Attributes, any>): Children {
 		return null;
 	}
 }

@@ -40,7 +40,7 @@ export class Router {
 		}
 	}
 
-	private createRoute(nextRoutes: Routes): m.RouteResolver {
+	private createRoute(nextRoutes: Routes): m.RouteResolver<m.Attributes, any> {
 		const otherRoutes = nextRoutes.slice();
 		const lastRoute = otherRoutes.pop() as Route;
 
@@ -52,7 +52,7 @@ export class Router {
 		return route;
 	}
 
-	private onmatch(lastRoute: Route, args: m.Vnode, newPath: string) {
+	private onmatch(lastRoute: Route, args: m.Vnode<m.Attributes, any>, newPath: string) {
 		this.addKeys(lastRoute, args);
 
 		if (lastRoute.abstract && lastRoute.default) {
@@ -62,7 +62,7 @@ export class Router {
 		return lastRoute.component;
 	}
 
-	private render(otherRoutes: Routes, lastRoute: Route, args: m.Vnode) {
+	private render(otherRoutes: Routes, lastRoute: Route) {
 		const render = otherRoutes.reduce((prev: m.Children, next: Route) => {
 			return m(next.component as any, next.props as m.Attributes, prev);
 		}, m(lastRoute.component as any, lastRoute.props as m.Attributes));
