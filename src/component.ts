@@ -12,6 +12,7 @@ export abstract class Component<Attributes> {
 	props: Attributes & DefaultAttributes<Attributes>;
 	children: m.Children;
 	preventDraw?: boolean;
+	decorators: any;
 
 	$onInit(vNode?: m.Vnode<Attributes, any>): any {}
 	$onCreate(vNode?: m.Vnode<Attributes, any>): any {}
@@ -25,16 +26,7 @@ export abstract class Component<Attributes> {
 
 		const template: (vNode: m.Vnode<Attributes, any>) => Children = Reflect.getMetadata(templateSymbol, this);
 
-		if (template) this.view = (vNode: m.Vnode<Attributes, any>): Children => {
-			this.children = vNode.children;
-
-			if (this.preventDraw) {
-				this.preventDraw = false;
-				return null;
-			}
-
-			return template.call(this, vNode);
-		};
+		if (template) this.view = render.bind(this, template);
 
 		if (this.props.ref) this.props.ref(this);
 	}
@@ -66,4 +58,20 @@ export abstract class Component<Attributes> {
 	private view(vNode: m.Vnode<Attributes, any>): Children {
 		return null;
 	}
+}
+
+function render(this: Component<any>, template: any, vNode: m.Vnode<any, any>): Children {
+	this.children = vNode.children;
+
+	if (this.preventDraw) {
+		this.preventDraw = false;
+
+		return null;
+	}
+
+	if (this.decorators) {
+		this.decorators.forEach((decorator: any) => decorator.call(this));
+	}
+
+	return template.call(this, vNode);
 }
