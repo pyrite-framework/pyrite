@@ -6,19 +6,14 @@ import * as sinon from "sinon";
 		<div>{this.text}</div>
 	);
 })
-export class TestHook extends Component<any> {
+export class TestHook implements Component<any> {
 	text: string;
-	
-	constructor(args: any) {
-		super(args);
-
-		this.$onInit = sinon.spy();
-		this.$onCreate = sinon.spy();
-		this.$onBeforeUpdate = sinon.spy();
-		this.$onUpdate = sinon.spy();
-		this.$onBeforeRemove = sinon.spy();
-		this.$onRemove = sinon.spy();
-	}
+	$onInit = sinon.spy();
+	$onCreate = sinon.spy();
+	$onBeforeUpdate = sinon.spy();
+	$onUpdate = sinon.spy();
+	$onBeforeRemove = sinon.spy();
+	$onRemove = sinon.spy();
 }
 
 
