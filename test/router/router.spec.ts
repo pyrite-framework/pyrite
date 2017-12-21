@@ -105,6 +105,18 @@ describe("Router", () => {
 		m.route.set("/child/other");
 	});
 
+	it("should have the key and state props", (done) => {
+		OtherChildComponent.prototype.$onCreate = async function () {
+			expect(this.props.key).to.be.equal("works");
+			expect(this.props.state).to.be.equal("on");
+
+			return done();
+		}
+
+		m.route(document.body, "/", route);
+		m.route.set("/child/works", {state: "on"});
+	})
+
 
 	it("should call $onInit of new children and call $onRemove of previous", (done) => {
 		let main: any, children: any, other: any;
@@ -172,5 +184,4 @@ describe("Router", () => {
 
 		m.route.set("/disabled");
 	});
-
 });
