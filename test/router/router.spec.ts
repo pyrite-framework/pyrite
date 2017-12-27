@@ -114,11 +114,7 @@ describe("Router", () => {
 		}
 
 		m.route(document.body, "/", route);
-<<<<<<< HEAD
 		m.route.set("/child/works", {state: "on"});
-=======
-		m.route.set("/child/works?state=on");
->>>>>>> deaaf9bfdbc45a59e28bdfbfbd222e5141f4d67b
 	})
 
 
