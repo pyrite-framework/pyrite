@@ -33,10 +33,17 @@ export class Router {
 	private addKeys(lastRoute: Route, args: {[key: string]: any}): void {
 		lastRoute.props = lastRoute.props || {};
 
+		if(lastRoute.props && args.state) {
+			lastRoute.props.state = args.state;
+		}
+
 		const argsKeys = Object.keys(args);
 
 		if (lastRoute.props && argsKeys.length) {
-			lastRoute.props.key = argsKeys.map((key) => args[key]).join("/");
+			lastRoute.props.key = argsKeys
+				.filter((key) => key !== "state")
+				.map((key) => args[key])
+				.join("/");
 		}
 	}
 

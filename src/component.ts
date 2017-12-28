@@ -6,6 +6,7 @@ export type Children = m.Children | JSX.Element | null | void;
 export interface DefaultAttributes<Attributes> {
 	ref?: (component: Component<Attributes>) => void;
 	key?: string | number;
+	state?: any;
 }
 
 export abstract class Component<Attributes> {
